@@ -1,0 +1,52 @@
+app:
+  name: 'trade-union-service'
+  version: '0.0.1'
+
+logger:
+  log_level: "debug"
+  disable_timestamp: false
+  full_timestamp: true
+
+fiber:
+  app_name: "Fiber-Server"
+  host: "0.0.0.0"
+  port: "8099"
+  read_timeout: 10
+  write_timeout: 10
+  idle_timeout: 10
+  read_buffer_size: 4096
+  write_buffer_size: 4096
+  handler:
+    cors:
+      max_age: 60
+      allow_methods:
+        - "OPTIONS"
+        - "POST"
+        - "GET"
+      allow_headers:
+        - "Authorization"
+        - "Credentials"
+        - "Mode"
+        - "Content-Type"
+      allow_origins:
+        - "http://localhost:4200"
+        - "https://localhost:4200"
+      allow_credentials: true
+      allow_all_origins: false
+
+http:
+  client:
+    timeout: 10
+    max_idle_connections: 100
+    max_connections_per_host: 100
+    max_idle_connections_per_host: 100
+    allow_follow_redirect: false
+
+redis:
+  host: "localhost"
+  port: "6379"
+  db: 0 # Default DB
+
+mongodb:
+  host: "localhost"
+  port: "27017"
