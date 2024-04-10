@@ -27,27 +27,6 @@ func getBotHandlers(bot *bot) []Handler {
 	}
 }
 
-const (
-	langRu = "ru"
-	langEn = "en"
-	defaultLang = langRu
-)
-
-func (b *bot) languageSupportMessage(msg *echotron.Message) {
-	switch msg.From.LanguageCode {
-	case langEn, langRu:
-	default:
-		msg.From.LanguageCode = defaultLang
-	}
-}
-
-func (b *bot) languageSupportCallback(callback *echotron.CallbackQuery) {
-	switch callback.From.LanguageCode {
-	case langEn, langRu:
-	default:
-		callback.From.LanguageCode = defaultLang
-	}
-}
 
 func (b *bot) handleMessage(update *echotron.Update) StateFn {
 	ctx, cancel := context.WithTimeout(context.Background(), 2 * time.Second)
@@ -56,8 +35,6 @@ func (b *bot) handleMessage(update *echotron.Update) StateFn {
 	if update.Message != nil {
 		b.log.WithField(chatIDLoggingKey, b.chatID).Debug("handleMessage - Message Text: ", update.Message.Text)
 		b.log.WithField(chatIDLoggingKey, b.chatID).Debug("handleMessage - Message LanguageCode: ", update.Message.From.LanguageCode)
-
-		b.languageSupportMessage(update.Message)
 
 		for i := range b.handlers {
 			switch update.Message.Text {

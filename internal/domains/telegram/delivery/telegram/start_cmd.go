@@ -10,8 +10,6 @@ import (
 )
 
 func (b *bot) handleStartCommand(update *echotron.Update) StateFn {
-	b.languageSupportMessage(update.Message)
-
 	if err := b.service.StartCommand(entity.StartCommandServiceDTO{
 		HandleCommand: entity.HandleCommand{
 			Lang:   update.Message.From.LanguageCode,

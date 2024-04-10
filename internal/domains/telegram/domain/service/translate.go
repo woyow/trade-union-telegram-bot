@@ -98,12 +98,22 @@ func getTranslateMap() translateMap {
 
 const (
 	translateNotExists = "translate not exists"
+	defaultLang = langRu
 )
 
+
 func (s *Service) translate(key, lang string) string {
+	// Check language support
+	switch lang {
+	case langEn, langRu:
+	default:
+		lang = defaultLang
+	}
+
 	val, ok := s.translateDict[key][lang]
 	if !ok {
 		return translateNotExists
 	}
+
 	return val
 }

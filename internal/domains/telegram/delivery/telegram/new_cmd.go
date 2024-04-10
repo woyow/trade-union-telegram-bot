@@ -10,8 +10,6 @@ import (
 
 
 func (b *bot) handleNewCommand(update *echotron.Update) StateFn {
-	b.languageSupportMessage(update.Message)
-
 	ctx, cancel := context.WithTimeout(context.Background(), 1 * time.Second)
 	defer cancel()
 
@@ -37,8 +35,6 @@ func (b *bot) handleNewFirstName(update *echotron.Update) StateFn {
 		return b.setState(ctx, stateNewFirstName, b.handleNewFirstName)
 	}
 
-	b.languageSupportMessage(update.Message)
-
 	if err := b.service.NewCommandFirstNameState(ctx, entity.NewCommandFirstNameStateServiceDTO{
 		HandleMessage: entity.HandleMessage{
 			Lang:   update.Message.From.LanguageCode,
@@ -62,8 +58,6 @@ func (b *bot) handleNewLastName(update *echotron.Update) StateFn {
 		return b.setState(ctx, stateNewLastName, b.handleNewLastName)
 	}
 
-	b.languageSupportMessage(update.Message)
-
 	if err := b.service.NewCommandLastNameState(ctx, entity.NewCommandLastNameStateServiceDTO{
 		HandleMessage: entity.HandleMessage{
 			Lang:   update.Message.From.LanguageCode,
@@ -86,8 +80,6 @@ func (b *bot) handleNewMiddleName(update *echotron.Update) StateFn {
 	if update.Message == nil {
 		return b.setState(ctx, stateNewMiddleName, b.handleNewMiddleName)
 	}
-
-	b.languageSupportMessage(update.Message)
 
 	if err := b.service.NewCommandMiddleNameState(ctx, entity.NewCommandMiddleNameStateServiceDTO{
 		HandleMessage: entity.HandleMessage{
@@ -114,8 +106,6 @@ func (b *bot) handleNewConfirmationCallback(update *echotron.Update) StateFn {
 	if update.CallbackQuery == nil {
 		return b.setState(ctx, stateNewConfirmationCallback, b.handleNewConfirmationCallback)
 	}
-
-	b.languageSupportCallback(update.CallbackQuery)
 
 	if err := b.service.NewCommandConfirmationState(ctx, entity.NewCommandConfirmationStateServiceDTO{
 		HandleCallback: entity.HandleCallback{
