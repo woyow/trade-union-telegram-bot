@@ -14,14 +14,19 @@ type Handler struct {
 	handleFn StateFn
 }
 
+const (
+	startCommand = "/start"
+	newCommand = "/new"
+)
+
 func getBotHandlers(bot *bot) []Handler {
 	return []Handler{
 		{
-			msgText:  "/start",
+			msgText:  startCommand,
 			handleFn: bot.handleStartCommand,
 		},
 		{
-			msgText:  "/new",
+			msgText:  newCommand,
 			handleFn: bot.handleNewCommand,
 		},
 	}
