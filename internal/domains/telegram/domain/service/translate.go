@@ -6,18 +6,22 @@ const (
 )
 
 const (
-	unknownCommandTranslateKey = "unknown_cmd.message"
-
+	// Common translate keys
 	somethingWentWrongTranslateKey = "something_went_wrong.message"
 
+	// Unknown command translate keys
+	unknownCommandTranslateKey = "unknown_cmd.message"
+
+	// Start command translate keys
 	startCommandTranslateKey = "start_cmd.message"
 
-	newCommandTranslateKey = "new_cmd.message"
-	newCommandFirstNameTranslateKey = "new_cmd.type_first_name.message"
-	newCommandLastNameTranslateKey = "new_cmd.type_last_name.message"
-	newCommandMiddleNameTranslateKey = "new_cmd.type_middle_name.message"
-	newCommandFullNameTranslateKey = "new_cmd.full_name.text"
-	newCommandSubjectTranslateKey = "new_cmd.subject_of_appeal.text"
+	// New command translate keys
+	newCommandTranslateKey                        = "new_cmd.message"
+	newCommandFirstNameTranslateKey               = "new_cmd.type_first_name.message"
+	newCommandLastNameTranslateKey                = "new_cmd.type_last_name.message"
+	newCommandMiddleNameTranslateKey              = "new_cmd.type_middle_name.message"
+	newCommandFullNameTranslateKey                = "new_cmd.full_name.text"
+	newCommandSubjectTranslateKey                 = "new_cmd.subject_of_appeal.text"
 	newCommandSendConfirmOkButtonTranslateKey     = "new_cmd.confirm_ok.button"
 	newCommandSendConfirmCancelButtonTranslateKey = "new_cmd.confirm_cancel.button"
 	newCommandConfirmSendAppealTranslateKey       = "new_cmd.confirm_send_appeal.message"
@@ -26,16 +30,15 @@ const (
 	newCommandConfirmAppealCanceledTranslateKey   = "new_cmd.confirm_appeal_canceled.message"
 )
 
-
 func getTranslateMap() translateMap {
 	m := translateMap{
-		unknownCommandTranslateKey: map[string]string{
-			langEn: "Unknown command. Try again!",
-			langRu: "Неизвестная команда. Попробуйте снова!",
-		},
 		somethingWentWrongTranslateKey: map[string]string{
 			langEn: "Oops. Something went wrong. Try again or later.",
 			langRu: "Уупс. Что-то пошло не так. Попробуйте заново, либо позже.",
+		},
+		unknownCommandTranslateKey: map[string]string{
+			langEn: "Unknown command. Try again!",
+			langRu: "Неизвестная команда. Попробуйте снова!",
 		},
 		startCommandTranslateKey: map[string]string{
 			langEn: "Hello, this bot assistant will help you draft a trade union appeal.",
@@ -91,4 +94,16 @@ func getTranslateMap() translateMap {
 		},
 	}
 	return m
+}
+
+const (
+	translateNotExists = "translate not exists"
+)
+
+func (s *Service) translate(key, lang string) string {
+	val, ok := s.translateDict[key][lang]
+	if !ok {
+		return translateNotExists
+	}
+	return val
 }

@@ -41,3 +41,23 @@ type GetUserOut struct {
 	Position string   `json:"position" bson:"position"`
 	ChatID   int64    `json:"chat_id" bson:"chatId"`
 }
+
+type UpdateUserServiceDTO struct {
+	ID       string
+	Roles    []string
+	Fname    *string
+	Lname    *string
+	Mname    *string
+	Position *string
+	ChatID   *int64
+}
+
+type UpdateUserRepoDTO struct {
+	ID       string
+	Roles    []string
+	Fname    *string
+	Lname    *string
+	Mname    *string
+	Position *string
+	ChatID   *int64
+}

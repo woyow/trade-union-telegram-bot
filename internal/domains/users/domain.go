@@ -13,6 +13,6 @@ import (
 
 func NewDomain(setupMongo *setupMongo.MongoDB, setupFiber *setupFiber.Fiber, log *logrus.Logger) {
 	repo := mongodb.NewRepoImpl(setupMongo.Client, log)
-	service := service.NewService(repo, repo, log)
-	http.NewHandler(service, setupFiber.App, log)
+	svc := service.NewService(repo, repo, log)
+	http.NewHandler(svc, setupFiber.App, log)
 }

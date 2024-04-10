@@ -9,5 +9,7 @@ type errResponse struct {
 }
 
 func errorResponse(c fiber.Ctx, statusCode int, err error) error {
-	return c.Status(statusCode).JSON(errResponse{Error: err.Error()})
+	return c.Status(statusCode).JSON(errResponse{
+		Error: err.Error(),
+	})
 }

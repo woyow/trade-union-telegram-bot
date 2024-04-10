@@ -5,8 +5,6 @@ import (
 
 	"trade-union-service/internal/domains/users/domain/entity"
 
-	usersV1 "trade-union-service/internal/domains/users/delivery/http/v1/users"
-
 	"github.com/gofiber/fiber/v3"
 	"github.com/sirupsen/logrus"
 )
@@ -22,17 +20,20 @@ type Handler struct {
 	log     *logrus.Logger
 }
 
-func NewHandler(service service, app *fiber.App, log *logrus.Logger) {
+func NewHandler(service service, router fiber.Router, log *logrus.Logger) {
 	handler := &Handler{
 		service: service,
 		log:     log,
 	}
 
-	handler.initRoutes(service, app, log)
+	handler.initRoutes(router)
 }
 
-func (h *Handler) initRoutes(service service, app *fiber.App, log *logrus.Logger) {
-	v1 := app.Group("/v1")
-
-	usersV1.NewHandler(service, v1, log)
+func (h *Handler) initRoutes(router fiber.Router) {
+	users := router.Group("/users")
+	{
+		users.Post("/new", h.createUser)
+		users.Get("/user", h.getUser)
+		users.Patch("/user", h.patchUser)
+	}
 }

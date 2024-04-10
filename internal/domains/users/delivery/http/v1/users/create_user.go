@@ -3,12 +3,14 @@ package http
 import (
 	"context"
 	"errors"
-	"github.com/gofiber/fiber/v3"
 	"net/http"
 	"os"
 	"time"
+
 	"trade-union-service/internal/domains/users/domain/entity"
 	"trade-union-service/internal/domains/users/errs"
+
+	"github.com/gofiber/fiber/v3"
 )
 
 const (
@@ -18,7 +20,7 @@ const (
 
 var (
 	errCreateUserAccessForbidden = errors.New("access forbidden")
-	errInvalidRole     = errors.New("invalid role")
+	errInvalidRole               = errors.New("invalid role")
 )
 
 func createUserAccess(c fiber.Ctx) (int, error) {
@@ -64,10 +66,14 @@ func (h *Handler) createUser(c fiber.Ctx) error {
 	var query createUserRequest
 
 	if err := c.Bind().JSON(&query); err != nil {
-		return err
+		return errorResponse(c, http.StatusBadRequest, err)
 	}
 
-	ctx, cancel := context.WithTimeout(c.Context(), 1 * time.Second)
+	if statusCode, err := query.validate(); err != nil {
+		return errorResponse(c, statusCode, err)
+	}
+
+	ctx, cancel := context.WithTimeout(c.Context(), 1*time.Second)
 	defer cancel()
 
 	out, err := h.service.CreateUser(ctx, entity.CreateUserServiceDTO{
@@ -80,7 +86,7 @@ func (h *Handler) createUser(c fiber.Ctx) error {
 	})
 	if err != nil {
 		switch err {
-		case errs.ErrUserAlreadyExists:
+		case errs.ErrUserWithChatIDAlreadyExists:
 			return errorResponse(c, http.StatusForbidden, err)
 		default:
 			return errorResponse(c, http.StatusInternalServerError, err)

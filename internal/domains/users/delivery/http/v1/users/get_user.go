@@ -44,10 +44,10 @@ func (h *Handler) getUser(c fiber.Ctx) error {
 	var query getUserRequest
 
 	if err := c.Bind().Query(&query); err != nil {
-		return err
+		return errorResponse(c, http.StatusBadRequest, err)
 	}
 
-	ctx, cancel := context.WithTimeout(c.Context(), 1 * time.Second)
+	ctx, cancel := context.WithTimeout(c.Context(), 1*time.Second)
 	defer cancel()
 
 	out, err := h.service.GetUser(ctx, entity.GetUserServiceDTO{

@@ -8,13 +8,10 @@ import (
 )
 
 const (
-	loggingKey = "layer"
-	loggingValue = "service"
 	chatIDLoggingKey = "chatID"
 
 	markdownParseMode = "MarkdownV2"
 )
-
 
 type repo interface {
 	// State management
@@ -32,17 +29,17 @@ type repo interface {
 type translateMap map[string]map[string]string
 
 type Service struct {
-	repo  repo
-	translate translateMap
-	api   *echotron.API
-	log   *logrus.Logger
+	repo          repo
+	translateDict translateMap
+	api           *echotron.API
+	log           *logrus.Logger
 }
 
 func NewService(repo repo, api *echotron.API, log *logrus.Logger) *Service {
 	return &Service{
-		repo:  repo,
-		translate: getTranslateMap(),
-		api:   api,
-		log:   log.WithField(loggingKey, loggingValue).Logger,
+		repo:          repo,
+		translateDict: getTranslateMap(),
+		api:           api,
+		log:           log,
 	}
 }

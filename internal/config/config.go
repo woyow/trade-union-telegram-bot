@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
 	"trade-union-service/internal/setup/app"
 	"trade-union-service/internal/setup/echotron"
 	"trade-union-service/internal/setup/fiber"

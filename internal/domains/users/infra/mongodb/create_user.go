@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	errUserAlreadyExists = "tradeUnion.users index: chatId_1 dup key"
+	errUserWithChatIDAlreadyExists = "tradeUnion.users index: chatId_1 dup key"
 )
 
 func (r *RepoImpl) CreateUser(ctx context.Context, dto entity.CreateUserRepoDTO) (*entity.CreateUserOut, error) {
@@ -29,10 +29,10 @@ func (r *RepoImpl) CreateUser(ctx context.Context, dto entity.CreateUserRepoDTO)
 		Collection(usersCollection).
 		InsertOne(ctx, doc)
 	if err != nil {
-		r.log.Error("mongo: CreateUser query error: ", err.Error())
-		if strings.Contains(err.Error(), errUserAlreadyExists) {
-			return nil, errs.ErrUserAlreadyExists
+		if strings.Contains(err.Error(), errUserWithChatIDAlreadyExists) {
+			return nil, errs.ErrUserWithChatIDAlreadyExists
 		}
+		r.log.Error("mongo: CreateUser query error: ", err.Error())
 		return nil, err
 	}
 
