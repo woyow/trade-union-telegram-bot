@@ -20,20 +20,16 @@ import (
 
 const (
 	configDir = "configs"
-
-	EnvLocal = "local"
-	EnvDev   = "dev"
-	EnvProd  = "prod"
 )
 
 type Config struct {
-	App         app.Config      `yaml:"app"`
-	HTTP        http.Config     `yaml:"http"`
-	Fiber       fiber.Config    `yaml:"fiber"`
-	Logger      logger.Config   `yaml:"logger"`
-	Redis       redis.Config    `yaml:"redis"`
-	MongoDB     mongodb.Config  `yaml:"mongodb"`
-	TelegramBot echotron.Config `yaml:"-"`
+	App      app.Config      `yaml:"app"`
+	HTTP     http.Config     `yaml:"http"`
+	Fiber    fiber.Config    `yaml:"fiber"`
+	Logger   logger.Config   `yaml:"logger"`
+	Redis    redis.Config    `yaml:"redis"`
+	MongoDB  mongodb.Config  `yaml:"mongodb"`
+	Echotron echotron.Config `yaml:"-"`
 }
 
 // New - Returns *Config struct

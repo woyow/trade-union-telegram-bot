@@ -1,0 +1,15 @@
+[
+  {
+    "createIndexes": "chatStates",
+    "indexes": [
+      {
+        "key": {
+          "chatId": 1
+        },
+        "name": "unique_chat_id",
+        "unique": true,
+        "background": true
+      }
+    ]
+  }
+]

@@ -16,6 +16,8 @@ import (
 	setupMongoDB "trade-union-service/internal/setup/mongodb"
 	setupRedis "trade-union-service/internal/setup/redis"
 
+	mongoDBMigrate "trade-union-service/internal/setup/mongodb/migrate"
+
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
@@ -27,11 +29,16 @@ type setup struct {
 	echotron *setupEchotron.Echotron
 }
 
+type migrate struct {
+	mongodb *mongoDBMigrate.Migrate
+}
+
 type app struct {
 	log      *logrus.Logger
 	cfg      *config.Config
 	errGroup *errgroup.Group
 	setup    setup
+	migrate  migrate
 	stopCh   chan os.Signal
 	ctx      context.Context
 	cancelFn context.CancelFunc
@@ -54,14 +61,19 @@ func NewApp() *app {
 
 	redis := setupRedis.NewRedis(&cfg.Redis, logger)
 
-	mongodb, err := setupMongoDB.NewMongoDB(ctx, &cfg.MongoDB)
+	mongodb, err := setupMongoDB.NewMongoDB(ctx, &cfg.MongoDB, logger)
+	if err != nil {
+		panic(err)
+	}
+
+	mongodbMigrate, err := mongoDBMigrate.NewMigrate(mongodb, logger)
 	if err != nil {
 		panic(err)
 	}
 
 	fiber := setupFiber.NewFiber(&cfg.Fiber, logger)
 
-	echotron, err := setupEchotron.NewEchotron(&cfg.TelegramBot, logger)
+	echotron, err := setupEchotron.NewEchotron(&cfg.Echotron, logger)
 	if err != nil {
 		panic(err)
 	}
@@ -79,10 +91,20 @@ func NewApp() *app {
 			redis:    redis,
 			echotron: echotron,
 		},
+		migrate: migrate{
+			mongodb: mongodbMigrate,
+		},
 	}
 }
 
 func (a *app) Run() error {
+	// Migrations
+	{
+		if err := a.migrate.mongodb.Run(); err != nil {
+			return err
+		}
+	}
+
 	// Initialize domains
 	{
 		telegram.NewDomain(a.setup.mongodb, a.setup.echotron, a.log)
@@ -90,7 +112,7 @@ func (a *app) Run() error {
 	}
 
 	// Handle stop program
-	a.errGroup.Go(func() error{
+	a.errGroup.Go(func() error {
 		sig := <-a.stopCh
 		a.log.Infof("Got %s signal. Aborting...\n", sig)
 		a.cancelFn()
@@ -105,7 +127,7 @@ func (a *app) Run() error {
 		return nil
 	})
 
-	if err := a.errGroup.Wait(); err != nil{
+	if err := a.errGroup.Wait(); err != nil {
 		a.log.Error("app: Run - g.Wait error: ", err.Error())
 		return err
 	}

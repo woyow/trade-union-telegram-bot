@@ -2,34 +2,49 @@ package mongodb
 
 import (
 	"context"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
 const (
-	proto = "mongodb://"
+	proto            = "mongodb://"
 	addressSeparator = ":"
 )
 
 type MongoDB struct {
 	Client *mongo.Client
+	Config *Config
 	Cancel context.CancelFunc
 }
 
-func NewMongoDB(ctx context.Context, cfg *Config) (*MongoDB, error) {
-	ctx, cancel := context.WithTimeout(ctx, 10 * time.Second)
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(proto + cfg.Host + addressSeparator + cfg.Port))
+func NewMongoDB(ctx context.Context, cfg *Config, log *logrus.Logger) (*MongoDB, error) {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+
+	//mongoURI := proto + cfg.Username + ":" + cfg.Password + "@" + cfg.Host + addressSeparator + cfg.Port + "/?authSource=tradeUnion"
+	mongoURI := proto + cfg.Host + addressSeparator + cfg.Port
+	log.Debug("mongoURI: ", mongoURI)
+
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI).SetAuth(options.Credential{
+		AuthMechanism: "SCRAM-SHA-1",
+		AuthSource:    cfg.AuthSource,
+		Username:      cfg.Username,
+		Password:      cfg.Password,
+	}))
 	if err != nil {
+		log.Error("setup mongodb: NewMongoDB - mongo.Connect error: ", err.Error())
 		return nil, err
 	}
 
 	if err := client.Ping(ctx, nil); err != nil {
+		log.Error("setup mongodb: NewMongoDB - client.Ping error: ", err.Error())
 		return nil, err
 	}
 
 	return &MongoDB{
 		Client: client,
+		Config: cfg,
 		Cancel: cancel,
 	}, nil
 }

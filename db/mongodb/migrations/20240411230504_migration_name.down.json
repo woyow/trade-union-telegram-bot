@@ -1,0 +1,6 @@
+[
+  {
+    "dropIndexes": "chatStates",
+    "index": "unique_chat_id"
+  }
+]

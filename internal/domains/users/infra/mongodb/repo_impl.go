@@ -8,7 +8,7 @@ import (
 const (
 	tradeUnionDatabase = "tradeUnion"
 
-	usersCollection = "users"
+	usersCollection = "tgUsers"
 )
 
 type RepoImpl struct {
@@ -19,6 +19,6 @@ type RepoImpl struct {
 func NewRepoImpl(db *mongo.Client, log *logrus.Logger) *RepoImpl {
 	return &RepoImpl{
 		db:  db,
-		log: log.WithField("mongo", "mmmm").Logger,
+		log: log,
 	}
 }

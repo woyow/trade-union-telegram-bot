@@ -31,20 +31,20 @@ type service interface {
 	NewCommandConfirmationState(ctx context.Context, dto entity.NewCommandConfirmationStateServiceDTO) error
 }
 
-type Bot struct {
+type Telegram struct {
 	dispatcher *echotron.Dispatcher
 	log        *logrus.Logger
 }
 
-func NewBot(service service, token string, log *logrus.Logger) *Bot {
+func NewTelegram(service service, token string, log *logrus.Logger) *Telegram {
 	dispatcher := echotron.NewDispatcher(token, newBot(service, log))
-	return &Bot{
+	return &Telegram{
 		dispatcher: dispatcher,
-		log: log,
+		log:        log,
 	}
 }
 
-func (b *Bot) Run() error {
+func (b *Telegram) Run() error {
 	defer b.log.Error("bot: Run - stop telegram bot")
 	b.log.Info("bot: Run - start telegram bot")
 	return b.dispatcher.Poll()
