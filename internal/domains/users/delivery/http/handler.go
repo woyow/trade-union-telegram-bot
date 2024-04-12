@@ -22,7 +22,7 @@ type Handler struct {
 	log     *logrus.Logger
 }
 
-func NewHandler(service service, app *fiber.App, log *logrus.Logger) {
+func InitHandler(service service, app *fiber.App, log *logrus.Logger) {
 	handler := &Handler{
 		service: service,
 		log:     log,
