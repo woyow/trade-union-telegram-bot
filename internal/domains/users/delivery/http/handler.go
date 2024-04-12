@@ -33,5 +33,5 @@ func InitHandler(service service, app *fiber.App, log *logrus.Logger) {
 func (h *Handler) initRoutes(service service, app *fiber.App, log *logrus.Logger) {
 	v1 := app.Group("/v1")
 
-	usersV1.NewHandler(service, v1, log)
+	usersV1.InitHandler(service, v1, log)
 }
