@@ -1,3 +1,8 @@
+install-tools:
+	go install github.com/swaggo/swag/cmd/swag@latest
+	go install github.com/golang-migrate/migrate/v4
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
+
 docker-build:
 	docker build -t trade-union-telegram-bot:latest . --file Dockerfile
 

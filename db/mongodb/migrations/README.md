@@ -4,8 +4,7 @@
 https://github.com/golang-migrate/migrate
 
 ## Install tool
-go get github.com/golang-migrate/migrate
-go install github.com/golang-migrate/migrate
+go install github.com/golang-migrate/migrate/v4
 
 ## Create up&down migration
 ```bash

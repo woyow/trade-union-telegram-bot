@@ -42,6 +42,7 @@ func (r *createUserRequest) validate() (int, error) {
 			return http.StatusBadRequest, errInvalidRole
 		}
 	}
+
 	return 0, nil
 }
 

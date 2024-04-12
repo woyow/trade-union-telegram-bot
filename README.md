@@ -10,8 +10,17 @@ cp .env.example .env
 For example:
 ```dotenv
 ENV: prod
-TELEGRAM_BOT_TOKEN: your_telegram_bot_token
-ADMIN_API_TOKEN: your_secret_token
+
+# Telegram bot
+TELEGRAM_BOT_TOKEN: example-telegram-token
+
+# Rest api for administrator
+ADMIN_API_TOKEN: example-token
+
+# Mongodb
+MONGO_USERNAME: admin
+MONGO_PASSWORD: mongopass
+MONGO_DATABASE: tradeUnion
 ```
 
 ### 2. Create config
@@ -23,4 +32,10 @@ cp ./configs/local.yaml ./configs/prod.yaml
 For example use nano editor:
 ```bash
 nano ./configs/prod.yaml
+```
+
+### 4. Run
+Run with docker-compose:
+```bash
+docker-compose up --build -d
 ```

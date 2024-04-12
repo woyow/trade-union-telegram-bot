@@ -12,8 +12,6 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
-
 const (
 	addressSeparator = ":"
 )
@@ -68,6 +66,8 @@ func getCorsMiddleware(cfg *CORS) fiber.Handler {
 }
 
 func getFiberApp(cfg *Config) *fiber.App {
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 	return fiber.New(fiber.Config{
 		AppName:         cfg.AppName,
 		ReadTimeout:     time.Duration(cfg.ReadTimeout) * time.Second,

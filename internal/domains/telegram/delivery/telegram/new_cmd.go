@@ -8,9 +8,8 @@ import (
 	"trade-union-service/internal/domains/telegram/errs"
 )
 
-
 func (b *bot) handleNewCommand(update *echotron.Update) StateFn {
-	ctx, cancel := context.WithTimeout(context.Background(), 1 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	if err := b.service.NewCommand(ctx, entity.NewCommandServiceDTO{
@@ -19,16 +18,17 @@ func (b *bot) handleNewCommand(update *echotron.Update) StateFn {
 			ChatID: b.chatID,
 		},
 	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).Error("bot: handleNewCommand - b.service.NewCommand error: ", err.Error())
+		b.log.WithField(chatIDLoggingKey, b.chatID).
+			Error("bot: handleNewCommand - b.service.NewCommand error: ", err.Error())
+
 		return b.setState(ctx, stateDefault, b.handleMessage)
 	}
 
 	return b.setState(ctx, stateNewFirstName, b.handleNewFirstName)
 }
 
-
 func (b *bot) handleNewFirstName(update *echotron.Update) StateFn {
-	ctx, cancel := context.WithTimeout(context.Background(), 1 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	if update.Message == nil {
@@ -39,19 +39,19 @@ func (b *bot) handleNewFirstName(update *echotron.Update) StateFn {
 		HandleMessage: entity.HandleMessage{
 			Lang:   update.Message.From.LanguageCode,
 			ChatID: b.chatID,
-			Text: update.Message.Text,
+			Text:   update.Message.Text,
 		},
 	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).Error("bot: handleNewFirstName - b.service.NewCommandFirstNameState error: ", err.Error())
+		b.log.WithField(chatIDLoggingKey, b.chatID).
+			Error("bot: handleNewFirstName - b.service.NewCommandFirstNameState error: ", err.Error())
 		return b.setState(ctx, stateDefault, b.handleMessage)
 	}
 
 	return b.setState(ctx, stateNewLastName, b.handleNewLastName)
 }
 
-
 func (b *bot) handleNewLastName(update *echotron.Update) StateFn {
-	ctx, cancel := context.WithTimeout(context.Background(), 1 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	if update.Message == nil {
@@ -65,16 +65,16 @@ func (b *bot) handleNewLastName(update *echotron.Update) StateFn {
 			Text:   update.Message.Text,
 		},
 	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).Error("bot: handleNewLastName - b.service.NewCommandLastNameStateerror: ", err.Error())
+		b.log.WithField(chatIDLoggingKey, b.chatID).
+			Error("bot: handleNewLastName - b.service.NewCommandLastNameStateerror: ", err.Error())
 		return b.setState(ctx, stateDefault, b.handleMessage)
 	}
 
 	return b.setState(ctx, stateNewMiddleName, b.handleNewMiddleName)
 }
 
-
 func (b *bot) handleNewMiddleName(update *echotron.Update) StateFn {
-	ctx, cancel := context.WithTimeout(context.Background(), 1 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	if update.Message == nil {
@@ -85,10 +85,11 @@ func (b *bot) handleNewMiddleName(update *echotron.Update) StateFn {
 		HandleMessage: entity.HandleMessage{
 			Lang:   update.Message.From.LanguageCode,
 			ChatID: b.chatID,
-			Text: update.Message.Text,
+			Text:   update.Message.Text,
 		},
 	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).Error("bot: handleNewLastName - b.service.NewCommandMiddleNameState error: ", err.Error())
+		b.log.WithField(chatIDLoggingKey, b.chatID).
+			Error("bot: handleNewLastName - b.service.NewCommandMiddleNameState error: ", err.Error())
 		return b.setState(ctx, stateDefault, b.handleMessage)
 	}
 
@@ -96,7 +97,7 @@ func (b *bot) handleNewMiddleName(update *echotron.Update) StateFn {
 }
 
 func (b *bot) handleNewConfirmationCallback(update *echotron.Update) StateFn {
-	ctx, cancel := context.WithTimeout(context.Background(), 1 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	if update.Message != nil {
@@ -114,7 +115,9 @@ func (b *bot) handleNewConfirmationCallback(update *echotron.Update) StateFn {
 			ChatID: b.chatID,
 		},
 	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).Error("bot: handleNewConfirmationCallback - b.service.NewCommandConfirmationState error: ", err.Error())
+		b.log.WithField(chatIDLoggingKey, b.chatID).
+			Error("bot: handleNewConfirmationCallback - b.service.NewCommandConfirmationState error: ", err.Error())
+
 		switch err {
 		case errs.ErrUnknownAnswer:
 			return b.setState(ctx, stateNewConfirmationCallback, b.handleNewConfirmationCallback)

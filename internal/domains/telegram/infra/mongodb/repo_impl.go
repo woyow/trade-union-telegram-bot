@@ -9,6 +9,8 @@ const (
 	chatIDLoggingKey = "chatID"
 
 	tradeUnionDatabase = "tradeUnion"
+
+	chatStatesCollection = "chatStates"
 )
 
 type RepoImpl struct {

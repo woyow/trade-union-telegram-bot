@@ -21,7 +21,8 @@ func (s *Service) UpdateUser(ctx context.Context, dto entity.UpdateUserServiceDT
 	}
 
 	out, err := s.repo.GetUser(ctx, entity.GetUserRepoDTO{
-		ID: &dto.ID,
+		ID:     &dto.ID,
+		ChatID: nil,
 	})
 	if err != nil {
 		s.log.Error("service: UpdateUser - s.repo.GetUser error: ", err.Error())

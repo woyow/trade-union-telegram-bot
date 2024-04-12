@@ -18,7 +18,8 @@ func NewDomain(setupMongo *setupMongo.MongoDB, setupEchotron *setupEchotron.Echo
 
 	go func() {
 		if err := bot.Run(); err != nil {
-			log.WithField("domain", "telegram").Error("NewDomain - bot.Run error: ", err.Error())
+			log.WithField("domain", "telegram").
+				Error("NewDomain - bot.Run error: ", err.Error())
 			return
 		}
 	}()

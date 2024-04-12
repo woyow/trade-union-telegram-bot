@@ -21,13 +21,14 @@ func (r *RepoImpl) GetUser(ctx context.Context, dto entity.GetUserRepoDTO) (*ent
 			r.log.Error("mongo: GetUser - primitive.ObjectIDFromHex error: ", err.Error())
 			return nil, err
 		}
+
 		filter = append(filter, bson.E{
-			Key: "_id",
+			Key:   "_id",
 			Value: objectID,
 		})
 	} else if dto.ChatID != nil {
 		filter = append(filter, bson.E{
-			Key: "chatId",
+			Key:   "chatId",
 			Value: *dto.ChatID,
 		})
 	}
@@ -42,6 +43,7 @@ func (r *RepoImpl) GetUser(ctx context.Context, dto entity.GetUserRepoDTO) (*ent
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, errs.ErrUserNotFound
 		}
+
 		r.log.Error("repo: GetUser - res.Decode error: ", err.Error())
 		return nil, err
 	}

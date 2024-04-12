@@ -6,16 +6,16 @@ const (
 )
 
 const (
-	// Common translate keys
+	// Common translate keys.
 	somethingWentWrongTranslateKey = "something_went_wrong.message"
 
-	// Unknown command translate keys
+	// Unknown command translate keys.
 	unknownCommandTranslateKey = "unknown_cmd.message"
 
-	// Start command translate keys
+	// Start command translate keys.
 	startCommandTranslateKey = "start_cmd.message"
 
-	// New command translate keys
+	// New command translate keys.
 	newCommandTranslateKey                        = "new_cmd.message"
 	newCommandFirstNameTranslateKey               = "new_cmd.type_first_name.message"
 	newCommandLastNameTranslateKey                = "new_cmd.type_last_name.message"
@@ -31,7 +31,7 @@ const (
 )
 
 func getTranslateMap() translateMap {
-	m := translateMap{
+	translate := translateMap{
 		somethingWentWrongTranslateKey: map[string]string{
 			langEn: "Oops. Something went wrong. Try again or later.",
 			langRu: "Уупс. Что-то пошло не так. Попробуйте заново, либо позже.",
@@ -93,14 +93,13 @@ func getTranslateMap() translateMap {
 			langRu: "Обращение было отменено.",
 		},
 	}
-	return m
+	return translate
 }
 
 const (
 	translateNotExists = "translate not exists"
-	defaultLang = langRu
+	defaultLang        = langRu
 )
-
 
 func (s *Service) translate(key, lang string) string {
 	// Check language support

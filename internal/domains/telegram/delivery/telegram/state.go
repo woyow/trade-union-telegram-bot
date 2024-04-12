@@ -11,7 +11,8 @@ func (b *bot) setStateAndCall(ctx context.Context, state string, stateFn StateFn
 		State:  state,
 		ChatID: b.chatID,
 	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).Error("bot: setState - b.service.SetChatCurrentState error: ", err.Error())
+		b.log.WithField(chatIDLoggingKey, b.chatID).
+			Error("bot: setState - b.service.SetChatCurrentState error: ", err.Error())
 	}
 
 	return stateFn(update)
@@ -22,7 +23,8 @@ func (b *bot) setState(ctx context.Context, state string, stateFn StateFn) State
 		State:  state,
 		ChatID: b.chatID,
 	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).Error("bot: setState - b.service.SetChatCurrentState error: ", err.Error())
+		b.log.WithField(chatIDLoggingKey, b.chatID).
+			Error("bot: setState - b.service.SetChatCurrentState error: ", err.Error())
 	}
 
 	return stateFn

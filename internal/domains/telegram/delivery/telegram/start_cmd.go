@@ -16,11 +16,12 @@ func (b *bot) handleStartCommand(update *echotron.Update) StateFn {
 			ChatID: b.chatID,
 		},
 	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).Error("bot: handleStartCommand error: ", err.Error())
+		b.log.WithField(chatIDLoggingKey, b.chatID).
+			Error("bot: handleStartCommand error: ", err.Error())
 		return b.handleMessage
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	return b.setState(ctx, stateDefault, b.handleMessage)

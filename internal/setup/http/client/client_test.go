@@ -50,7 +50,7 @@ func prepareHandler(port string) http.Handler {
 	return handler
 }
 
-func prepareHttpServer(t *testing.T, port string, handler http.Handler) {
+func prepareHttpServer(port string, handler http.Handler) {
 	httpServer := &http.Server{
 		Addr:              ":" + port,
 		Handler:           handler,
@@ -73,7 +73,7 @@ func prepareHttpServer(t *testing.T, port string, handler http.Handler) {
 func TestAllowRedirects(t *testing.T) {
 	port := "8988"
 	handler := prepareHandler(port)
-	prepareHttpServer(t, port, handler)
+	prepareHttpServer(port, handler)
 
 	cases := []struct {
 		name     string
@@ -141,7 +141,9 @@ func TestAllowRedirects(t *testing.T) {
 		testCase := testCase
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
-			httpClient := getHttpClient(testCase.cfg)
+
+			httpClient := getHTTPClient(testCase.cfg)
+
 			resp, err := httpClient.Get(fmt.Sprintf("http://0.0.0.0:%s/%s", port, testCase.endPoint))
 			if err == nil {
 				if resp.StatusCode == http.StatusOK {
@@ -149,12 +151,19 @@ func TestAllowRedirects(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
+
 					bodyString := string(bodyBytes)
 
 					if bodyString != youHasBeenRedirectedResponse {
 						t.Fatalf("error - body got: %s, want: %s", bodyString, youHasBeenRedirectedResponse)
 					}
 				}
+			} else {
+				t.Fatal("httpClient.Get error: ", err.Error())
+			}
+
+			if err := resp.Body.Close(); err != nil {
+				t.Fatal("close response body error: ", err.Error())
 			}
 		})
 	}
@@ -163,7 +172,7 @@ func TestAllowRedirects(t *testing.T) {
 func TestDisallowRedirects(t *testing.T) {
 	port := "8989"
 	handler := prepareHandler(port)
-	prepareHttpServer(t, port, handler)
+	prepareHttpServer(port, handler)
 
 	cases := []struct {
 		name         string
@@ -237,14 +246,20 @@ func TestDisallowRedirects(t *testing.T) {
 		testCase := testCase
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
-			httpClient := getHttpClient(testCase.cfg)
-			_, err := httpClient.Get(fmt.Sprintf("http://0.0.0.0:%s/%s", port, testCase.endPoint))
+
+			httpClient := getHTTPClient(testCase.cfg)
+
+			resp, err := httpClient.Get(fmt.Sprintf("http://0.0.0.0:%s/%s", port, testCase.endPoint))
 			if err != nil {
 				if err.Error() != testCase.expErrString {
 					t.Fatalf("error - got: %s, want: %s", err.Error(), errRedirectNotAllowed)
 				}
 			} else {
 				t.Fatalf("error must not be nil: %s, must be: %s", err, testCase.expErrString)
+			}
+
+			if err := resp.Body.Close(); err != nil {
+				t.Fatal("close response body error: ", err.Error())
 			}
 		})
 	}

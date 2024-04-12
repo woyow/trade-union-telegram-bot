@@ -12,6 +12,7 @@ type Echotron struct {
 
 func NewEchotron(cfg *Config, log *logrus.Logger) (*Echotron, error) {
 	api := echotron.NewAPI(cfg.Token)
+
 	log.Info("setup echotron: NewEchotron - API has been initialized")
 
 	return &Echotron{
@@ -19,4 +20,3 @@ func NewEchotron(cfg *Config, log *logrus.Logger) (*Echotron, error) {
 		Token: cfg.Token,
 	}, nil
 }
-

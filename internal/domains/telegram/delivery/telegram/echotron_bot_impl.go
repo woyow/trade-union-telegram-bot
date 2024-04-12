@@ -27,7 +27,7 @@ func newBot(service service, log *logrus.Logger) func(chatID int64) echotron.Bot
 
 		bot.handlers = getBotHandlers(bot)
 
-		ctx, cancel := context.WithTimeout(context.Background(), 1 * time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		defer cancel()
 
 		chatCurrentState, err := bot.service.GetChatCurrentState(ctx, entity.GetChatCurrentStateServiceDTO{
@@ -44,16 +44,20 @@ func newBot(service service, log *logrus.Logger) func(chatID int64) echotron.Bot
 						Error("bot: newBot - bot.service.CreateChatCurrentState error: ", err.Error())
 				}
 			}
+
 			bot.state = bot.handleMessage
 		} else {
 			m := bot.getChatStates()
+
 			state, ok := m[chatCurrentState.State]
 			if ok {
 				bot.state = state
-				bot.log.WithField(chatIDLoggingKey, bot.chatID).Info("bot: newBot - Set " + chatCurrentState.State + " handler")
+				bot.log.WithField(chatIDLoggingKey, bot.chatID).
+					Info("bot: newBot - Set " + chatCurrentState.State + " handler")
 			} else {
 				bot.state = bot.handleMessage
-				bot.log.WithField(chatIDLoggingKey, bot.chatID).Info("bot: newBot - Set default handler")
+				bot.log.WithField(chatIDLoggingKey, bot.chatID).
+					Info("bot: newBot - Set default handler")
 			}
 		}
 
@@ -62,44 +66,43 @@ func newBot(service service, log *logrus.Logger) func(chatID int64) echotron.Bot
 }
 
 func (b *bot) Update(update *echotron.Update) {
-	//b.log.Debug("Update - message:", update.Message.Text)
 	b.state = b.state(update)
 }
 
 type chatStatesMap map[string]StateFn
 
 const (
-	// Default
-	stateEmpty = ""
+	// Default.
+	stateEmpty   = ""
 	stateDefault = "default"
 
-	// Start command
+	// Start command.
 	stateStartCommand = "/start"
 
-	// New command
-	stateNewCommand = "/new"
-	stateNewFirstName = "/new_first_name"
-	stateNewLastName = "/new_last_name"
-	stateNewMiddleName = "/new_middle_name"
+	// New command.
+	stateNewCommand              = "/new"
+	stateNewFirstName            = "/new_first_name"
+	stateNewLastName             = "/new_last_name"
+	stateNewMiddleName           = "/new_middle_name"
 	stateNewConfirmationCallback = "/new_confirmation_callback"
 )
 
 func (b *bot) getChatStates() chatStatesMap {
-	m := chatStatesMap{
+	chatStates := chatStatesMap{
 		// Default
-		stateEmpty: b.handleMessage,
+		stateEmpty:   b.handleMessage,
 		stateDefault: b.handleMessage,
 
 		// Start command
 		stateStartCommand: b.handleStartCommand,
 
 		// New command
-		stateNewCommand: b.handleNewCommand,
-		stateNewFirstName: b.handleNewFirstName,
-		stateNewLastName: b.handleNewLastName,
-		stateNewMiddleName: b.handleNewMiddleName,
+		stateNewCommand:              b.handleNewCommand,
+		stateNewFirstName:            b.handleNewFirstName,
+		stateNewLastName:             b.handleNewLastName,
+		stateNewMiddleName:           b.handleNewMiddleName,
 		stateNewConfirmationCallback: b.handleNewConfirmationCallback,
 	}
 
-	return m
+	return chatStates
 }

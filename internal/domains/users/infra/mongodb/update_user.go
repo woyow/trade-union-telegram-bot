@@ -11,6 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+const (
+	defaultCapacity = 6 // Number of possible fields to update
+)
+
 func (r *RepoImpl) UpdateUser(ctx context.Context, dto entity.UpdateUserRepoDTO) error {
 	objectID, err := primitive.ObjectIDFromHex(dto.ID)
 	if err != nil {
@@ -20,7 +24,7 @@ func (r *RepoImpl) UpdateUser(ctx context.Context, dto entity.UpdateUserRepoDTO)
 
 	filter := bson.D{{"_id", objectID}}
 
-	update := make(bson.D, 0, 6)
+	update := make(bson.D, 0, defaultCapacity)
 
 	if dto.Fname != nil {
 		update = append(update, bson.E{
@@ -74,6 +78,7 @@ func (r *RepoImpl) UpdateUser(ctx context.Context, dto entity.UpdateUserRepoDTO)
 		if strings.Contains(err.Error(), errUserWithChatIDAlreadyExists) {
 			return errs.ErrUserWithChatIDAlreadyExists
 		}
+
 		r.log.Error("mongo: UpdateUser query error: ", err.Error())
 		return err
 	}

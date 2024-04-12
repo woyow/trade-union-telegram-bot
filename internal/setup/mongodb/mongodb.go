@@ -22,7 +22,6 @@ type MongoDB struct {
 func NewMongoDB(ctx context.Context, cfg *Config, log *logrus.Logger) (*MongoDB, error) {
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 
-	//mongoURI := proto + cfg.Username + ":" + cfg.Password + "@" + cfg.Host + addressSeparator + cfg.Port + "/?authSource=tradeUnion"
 	mongoURI := proto + cfg.Host + addressSeparator + cfg.Port
 	log.Debug("mongoURI: ", mongoURI)
 

@@ -49,6 +49,7 @@ func (m *Migrate) Run() error {
 			m.log.Debug("mongodb migrate: Run - no change")
 			return nil
 		}
+
 		m.log.Fatal("mongodb migrate: Run - m.m.Up error: ", err.Error())
 		return err
 	}

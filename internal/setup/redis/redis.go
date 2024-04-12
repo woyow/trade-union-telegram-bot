@@ -5,13 +5,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Redis - Redis storage
+// Redis - Redis storage.
 type Redis struct {
 	client *redis.Client
 	log    *logrus.Logger
 }
 
-// New - Returns *Redis
+// NewRedis - Returns *Redis.
 func NewRedis(cfg *Config, log *logrus.Logger) *Redis {
 	client := getRedisClient(cfg)
 

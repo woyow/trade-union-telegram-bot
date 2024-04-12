@@ -32,6 +32,7 @@ func (r *RepoImpl) CreateUser(ctx context.Context, dto entity.CreateUserRepoDTO)
 		if strings.Contains(err.Error(), errUserWithChatIDAlreadyExists) {
 			return nil, errs.ErrUserWithChatIDAlreadyExists
 		}
+
 		r.log.Error("mongo: CreateUser query error: ", err.Error())
 		return nil, err
 	}

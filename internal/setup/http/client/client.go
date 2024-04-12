@@ -10,31 +10,32 @@ var (
 	errRedirectNotAllowed = errors.New("redirect not allowed")
 )
 
-type HttpClient struct {
+type HTTPClient struct {
 	*http.Client
 }
 
-// NewHttpClient - .
-func NewHttpClient(cfg *Config) *HttpClient {
-	httpClient := getHttpClient(cfg)
+// NewHTTPClient - .
+func NewHTTPClient(cfg *Config) *HTTPClient {
+	httpClient := getHTTPClient(cfg)
 
-	return &HttpClient{
+	return &HTTPClient{
 		httpClient,
 	}
 }
 
 // disallowFollowRedirectFunc - redirect wrapper
-func disallowFollowRedirectFunc(req *http.Request, via []*http.Request) error {
+func disallowFollowRedirectFunc(_ *http.Request, _ []*http.Request) error {
 	return errRedirectNotAllowed
 }
 
-// getHttpClient - Returns *http.Client
-func getHttpClient(cfg *Config) *http.Client {
+// getHTTPClient - Returns *http.Client
+func getHTTPClient(cfg *Config) *http.Client {
 	var transport *http.Transport
-	if _, ok := http.DefaultTransport.(*http.Transport); !ok {
-		panic(ok)
-	} else {
+
+	if _, ok := http.DefaultTransport.(*http.Transport); ok {
 		transport = http.DefaultTransport.(*http.Transport).Clone()
+	} else {
+		panic(ok)
 	}
 
 	transport.MaxIdleConns = cfg.MaxIdleConnections

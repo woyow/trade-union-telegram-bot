@@ -3,17 +3,12 @@ package mongodb
 import (
 	"context"
 	"errors"
-	"go.mongodb.org/mongo-driver/mongo"
-	"strings"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"strings"
 	"trade-union-service/internal/domains/telegram/domain/entity"
 	"trade-union-service/internal/domains/telegram/errs"
-)
-
-const (
-	chatStatesCollection = "chatStates"
 )
 
 const (
@@ -25,14 +20,16 @@ func (r *RepoImpl) CreateChatCurrentState(ctx context.Context, dto entity.Create
 		"chatId": dto.ChatID,
 		"state":  dto.State,
 	}
+
 	res, err := r.db.Database(tradeUnionDatabase).
 		Collection(chatStatesCollection).
 		InsertOne(ctx, doc)
 	if err != nil {
-		r.log.Error("mongo: CreateChatCurrentState query error: ", err.Error())
 		if strings.Contains(err.Error(), errUserAlreadyExists) {
 			return nil, errs.ErrChatCurrentStateAlreadyExists
 		}
+
+		r.log.Error("mongo: CreateChatCurrentState query error: ", err.Error())
 		return nil, err
 	}
 
@@ -71,7 +68,9 @@ func (r *RepoImpl) GetChatCurrentState(ctx context.Context, dto entity.GetChatCu
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, errs.ErrChatCurrentStateNotExists
 		}
-		r.log.WithField(chatIDLoggingKey, dto.ChatID).Error("repo: GetChatCurrentState - res.Decode error: ", err.Error())
+
+		r.log.WithField(chatIDLoggingKey, dto.ChatID).
+			Error("repo: GetChatCurrentState - res.Decode error: ", err.Error())
 		return nil, err
 	}
 
