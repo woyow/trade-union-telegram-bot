@@ -2,6 +2,7 @@ package fiber
 
 import (
 	"context"
+	"net/http"
 	"strings"
 	"time"
 
@@ -70,7 +71,7 @@ func getCorsMiddleware(cfg *CORS) fiber.Handler {
 func getFiberApp(cfg *Config) *fiber.App {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	return fiber.New(fiber.Config{
+	app := fiber.New(fiber.Config{
 		AppName:         cfg.AppName,
 		ReadTimeout:     time.Duration(cfg.ReadTimeout) * time.Second,
 		WriteTimeout:    time.Duration(cfg.WriteTimeout) * time.Second,
@@ -80,4 +81,14 @@ func getFiberApp(cfg *Config) *fiber.App {
 		JSONEncoder:     json.Marshal,
 		JSONDecoder:     json.Unmarshal,
 	})
+
+	app.Get("/health", healthHandler)
+
+	return app
+}
+
+const okResponse = "OK"
+
+func healthHandler(c fiber.Ctx) error {
+	return c.Status(http.StatusOK).SendString(okResponse)
 }
