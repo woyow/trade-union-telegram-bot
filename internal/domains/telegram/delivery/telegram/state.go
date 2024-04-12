@@ -6,6 +6,44 @@ import (
 	"trade-union-service/internal/domains/telegram/domain/entity"
 )
 
+type chatStatesMap map[string]StateFn
+
+const (
+	// Default.
+	stateEmpty   = ""
+	stateDefault = "default"
+
+	// Start command.
+	stateStartCommand = "/start"
+
+	// New command.
+	stateNewCommand              = "/new"
+	stateNewFirstName            = "/new_first_name"
+	stateNewLastName             = "/new_last_name"
+	stateNewMiddleName           = "/new_middle_name"
+	stateNewConfirmationCallback = "/new_confirmation_callback"
+)
+
+func (b *bot) getChatStates() chatStatesMap {
+	chatStates := chatStatesMap{
+		// Default
+		stateEmpty:   b.handleMessage,
+		stateDefault: b.handleMessage,
+
+		// Start command
+		stateStartCommand: b.handleStartCommand,
+
+		// New command
+		stateNewCommand:              b.handleNewCommand,
+		stateNewFirstName:            b.handleNewFirstName,
+		stateNewLastName:             b.handleNewLastName,
+		stateNewMiddleName:           b.handleNewMiddleName,
+		stateNewConfirmationCallback: b.handleNewConfirmationCallback,
+	}
+
+	return chatStates
+}
+
 func (b *bot) setStateAndCall(ctx context.Context, state string, stateFn StateFn, update *echotron.Update) StateFn {
 	if err := b.service.SetChatCurrentState(ctx, entity.SetChatCurrentStateServiceDTO{
 		State:  state,

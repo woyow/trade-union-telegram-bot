@@ -1,6 +1,6 @@
 # trade-union-telegram-bot
 
-Telegram bot
+Telegram bot with state management
 
 # Usage
 ### 1. Create .env file
