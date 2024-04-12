@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"net/http"
 
 	"trade-union-service/internal/domains/users/domain/entity"
 
@@ -32,7 +33,15 @@ func InitHandler(service service, app *fiber.App, log *logrus.Logger) {
 }
 
 func (h *Handler) initRoutes(service service, app *fiber.App, log *logrus.Logger) {
+	app.Get("/health", h.healthHandler)
+
 	v1 := app.Group("/v1")
 
 	usersV1.NewHandler(service, v1, log)
+}
+
+const okResponse = "OK"
+
+func (h *Handler) healthHandler(c fiber.Ctx) error {
+	return c.Status(http.StatusOK).SendString(okResponse)
 }
