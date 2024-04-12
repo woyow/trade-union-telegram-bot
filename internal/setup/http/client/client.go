@@ -23,12 +23,12 @@ func NewHTTPClient(cfg *Config) *HTTPClient {
 	}
 }
 
-// disallowFollowRedirectFunc - redirect wrapper
+// disallowFollowRedirectFunc - redirect wrapper.
 func disallowFollowRedirectFunc(_ *http.Request, _ []*http.Request) error {
 	return errRedirectNotAllowed
 }
 
-// getHTTPClient - Returns *http.Client
+// getHTTPClient - Returns *http.Client.
 func getHTTPClient(cfg *Config) *http.Client {
 	var transport *http.Transport
 

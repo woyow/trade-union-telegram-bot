@@ -46,8 +46,10 @@ func (f *Fiber) Run(ctx context.Context) error {
 		EnablePrintRoutes:     true,
 	}); err != nil {
 		f.log.Error("fiber: Run - f.app.Listen error: ", err.Error())
+
 		return err
 	}
+
 	return nil
 }
 
@@ -66,7 +68,7 @@ func getCorsMiddleware(cfg *CORS) fiber.Handler {
 }
 
 func getFiberApp(cfg *Config) *fiber.App {
-	var json = jsoniter.ConfigCompatibleWithStandardLibrary
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
 	return fiber.New(fiber.Config{
 		AppName:         cfg.AppName,

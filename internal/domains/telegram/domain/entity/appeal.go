@@ -1,6 +1,5 @@
 package entity
 
-
 type DeleteDraftAppealRepoDTO struct {
 	ChatID int64
 }

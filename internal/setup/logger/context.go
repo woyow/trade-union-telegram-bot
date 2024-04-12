@@ -17,5 +17,6 @@ func Ctx(ctx context.Context) *logrus.Entry {
 	if entity, ok := ctx.Value(key).(*logrus.Entry); ok {
 		return entity
 	}
+
 	return logrus.NewEntry(logrus.StandardLogger())
 }

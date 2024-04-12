@@ -1,5 +1,6 @@
 package fiber
 
+// Config - Fiber config.
 type Config struct {
 	Handler         Handler `yaml:"handler"`
 	AppName         string  `yaml:"app_name"`
@@ -12,11 +13,12 @@ type Config struct {
 	WriteBufferSize int     `yaml:"write_buffer_size"`
 }
 
+// Handler - Http handler parameters (CORS, Middleware, Cookies, etc...).
 type Handler struct {
 	CORS CORS `yaml:"cors"`
 }
 
-// CORS - CORS parameters
+// CORS - CORS parameters.
 type CORS struct {
 	AllowMethods     []string `yaml:"allow_methods"`
 	AllowHeaders     []string `yaml:"allow_headers"`

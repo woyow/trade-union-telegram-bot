@@ -25,7 +25,7 @@ const (
 	addressSeparator = ":"
 )
 
-// getRedisClient - Returns *redis.Client
+// getRedisClient - Returns *redis.Client.
 func getRedisClient(cfg *Config) *redis.Client {
 	return redis.NewClient(&redis.Options{
 		Addr:     cfg.Host + addressSeparator + cfg.Port,

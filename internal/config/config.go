@@ -22,6 +22,7 @@ const (
 	configDir = "configs"
 )
 
+// Config - Aggregate configurations for application.
 type Config struct {
 	App      app.Config      `yaml:"app"`
 	HTTP     http.Config     `yaml:"http"`
@@ -32,7 +33,7 @@ type Config struct {
 	Echotron echotron.Config `yaml:"-"`
 }
 
-// New - Returns *Config struct
+// NewConfig - Returns *Config.
 func NewConfig() (*Config, error) {
 	var cfg Config
 
