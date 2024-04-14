@@ -20,6 +20,7 @@ const (
 	newCommandFirstNameTranslateKey               = "new_cmd.type_first_name.message"
 	newCommandLastNameTranslateKey                = "new_cmd.type_last_name.message"
 	newCommandMiddleNameTranslateKey              = "new_cmd.type_middle_name.message"
+	newCommandChooseSubjectOfAppealTranslateKey   = "new_cmd.type_choose_appeal_subject.text"
 	newCommandFullNameTranslateKey                = "new_cmd.full_name.text"
 	newCommandSubjectTranslateKey                 = "new_cmd.subject_of_appeal.text"
 	newCommandSendConfirmOkButtonTranslateKey     = "new_cmd.confirm_ok.button"
@@ -29,6 +30,8 @@ const (
 	newCommandConfirmAppealCreatedTranslateKey    = "new_cmd.confirm_appeal_created.message"
 	newCommandConfirmAppealCanceledTranslateKey   = "new_cmd.confirm_appeal_canceled.message"
 )
+
+type translateMap map[string]map[string]string
 
 func getTranslateMap() translateMap {
 	translate := translateMap{
@@ -59,6 +62,10 @@ func getTranslateMap() translateMap {
 		newCommandMiddleNameTranslateKey: map[string]string{
 			langEn: "Enter middle name:",
 			langRu: "Введите отчество:",
+		},
+		newCommandChooseSubjectOfAppealTranslateKey: map[string]string{
+			langEn: "Select the subject of your appeal:",
+			langRu: "Выберите тему обращения:",
 		},
 		newCommandConfirmSendAppealTranslateKey: map[string]string{
 			langEn: "Confirm or cancel sending the request",

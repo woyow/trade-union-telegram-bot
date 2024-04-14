@@ -21,7 +21,7 @@ func (b *bot) handleNewCommand(update *echotron.Update) StateFn {
 		b.log.WithField(chatIDLoggingKey, b.chatID).
 			Error("bot: handleNewCommand - b.service.NewCommand error: ", err.Error())
 
-		return b.setState(ctx, stateDefault, b.handleMessage)
+		return b.setState(ctx, stateDefault, b.handleDefault)
 	}
 
 	return b.setState(ctx, stateNewFirstName, b.handleNewFirstName)
@@ -44,7 +44,7 @@ func (b *bot) handleNewFirstName(update *echotron.Update) StateFn {
 	}); err != nil {
 		b.log.WithField(chatIDLoggingKey, b.chatID).
 			Error("bot: handleNewFirstName - b.service.NewCommandFirstNameState error: ", err.Error())
-		return b.setState(ctx, stateDefault, b.handleMessage)
+		return b.setState(ctx, stateDefault, b.handleDefault)
 	}
 
 	return b.setState(ctx, stateNewLastName, b.handleNewLastName)
@@ -67,7 +67,7 @@ func (b *bot) handleNewLastName(update *echotron.Update) StateFn {
 	}); err != nil {
 		b.log.WithField(chatIDLoggingKey, b.chatID).
 			Error("bot: handleNewLastName - b.service.NewCommandLastNameStateerror: ", err.Error())
-		return b.setState(ctx, stateDefault, b.handleMessage)
+		return b.setState(ctx, stateDefault, b.handleDefault)
 	}
 
 	return b.setState(ctx, stateNewMiddleName, b.handleNewMiddleName)
@@ -90,7 +90,40 @@ func (b *bot) handleNewMiddleName(update *echotron.Update) StateFn {
 	}); err != nil {
 		b.log.WithField(chatIDLoggingKey, b.chatID).
 			Error("bot: handleNewLastName - b.service.NewCommandMiddleNameState error: ", err.Error())
-		return b.setState(ctx, stateDefault, b.handleMessage)
+		return b.setState(ctx, stateDefault, b.handleDefault)
+	}
+
+	return b.setState(ctx, stateNewSubjectCallback, b.handleNewSubjectCallback)
+}
+
+func (b *bot) handleNewSubjectCallback(update *echotron.Update) StateFn {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
+	if update.Message != nil {
+		return b.setStateAndCall(ctx, stateDefault, b.handleDefault, update)
+	}
+
+	if update.CallbackQuery == nil {
+		return b.setState(ctx, stateNewSubjectCallback, b.handleNewSubjectCallback)
+	}
+
+	if err := b.service.NewCommandSubjectState(ctx, entity.NewCommandSubjectStateServiceDTO{
+		HandleCallback: entity.HandleCallback{
+			Lang:   update.CallbackQuery.From.LanguageCode,
+			Data:   update.CallbackQuery.Data,
+			ChatID: b.chatID,
+		},
+	}); err != nil {
+		b.log.WithField(chatIDLoggingKey, b.chatID).
+			Error("bot: handleNewSubjectCallback - b.service.NewCommandSubjectState error: ", err.Error())
+
+		switch err {
+		case errs.ErrUnknownAnswer:
+			return b.setState(ctx, stateNewSubjectCallback, b.handleNewSubjectCallback)
+		}
+
+		return b.setState(ctx, stateDefault, b.handleDefault)
 	}
 
 	return b.setState(ctx, stateNewConfirmationCallback, b.handleNewConfirmationCallback)
@@ -101,7 +134,7 @@ func (b *bot) handleNewConfirmationCallback(update *echotron.Update) StateFn {
 	defer cancel()
 
 	if update.Message != nil {
-		return b.setStateAndCall(ctx, stateDefault, b.handleMessage, update)
+		return b.setStateAndCall(ctx, stateDefault, b.handleDefault, update)
 	}
 
 	if update.CallbackQuery == nil {
@@ -122,8 +155,9 @@ func (b *bot) handleNewConfirmationCallback(update *echotron.Update) StateFn {
 		case errs.ErrUnknownAnswer:
 			return b.setState(ctx, stateNewConfirmationCallback, b.handleNewConfirmationCallback)
 		}
-		return b.setState(ctx, stateDefault, b.handleMessage)
+
+		return b.setState(ctx, stateDefault, b.handleDefault)
 	}
 
-	return b.setState(ctx, stateDefault, b.handleMessage)
+	return b.setState(ctx, stateDefault, b.handleDefault)
 }

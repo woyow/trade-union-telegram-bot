@@ -5,10 +5,14 @@ import (
 )
 
 func (s *Service) StartCommand(dto entity.StartCommandServiceDTO) error {
-	_, err := s.api.SendMessage(s.translate(startCommandTranslateKey, dto.Lang), dto.ChatID, nil)
-	if err != nil {
+	if err := s.api.SendMessage(entity.SendMessageApiDTO{
+		Text:    s.translate(startCommandTranslateKey, dto.Lang),
+		ChatID:  dto.ChatID,
+		Options: nil,
+	}); err != nil {
 		s.log.WithField(chatIDLoggingKey, dto.ChatID).
 			Error("service: StartCommand - s.api.SendMessage error", err.Error())
 	}
+
 	return nil
 }

@@ -28,6 +28,7 @@ type service interface {
 	NewCommandFirstNameState(ctx context.Context, dto entity.NewCommandFirstNameStateServiceDTO) error
 	NewCommandLastNameState(ctx context.Context, dto entity.NewCommandLastNameStateServiceDTO) error
 	NewCommandMiddleNameState(ctx context.Context, dto entity.NewCommandMiddleNameStateServiceDTO) error
+	NewCommandSubjectState(ctx context.Context, dto entity.NewCommandSubjectStateServiceDTO) error
 	NewCommandConfirmationState(ctx context.Context, dto entity.NewCommandConfirmationStateServiceDTO) error
 }
 

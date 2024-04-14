@@ -21,14 +21,15 @@ const (
 	stateNewFirstName            = "/new_first_name"
 	stateNewLastName             = "/new_last_name"
 	stateNewMiddleName           = "/new_middle_name"
+	stateNewSubjectCallback      = "/new_subject_callback"
 	stateNewConfirmationCallback = "/new_confirmation_callback"
 )
 
 func (b *bot) getChatStates() chatStatesMap {
 	chatStates := chatStatesMap{
 		// Default
-		stateEmpty:   b.handleMessage,
-		stateDefault: b.handleMessage,
+		stateEmpty:   b.handleDefault,
+		stateDefault: b.handleDefault,
 
 		// Start command
 		stateStartCommand: b.handleStartCommand,
@@ -38,6 +39,7 @@ func (b *bot) getChatStates() chatStatesMap {
 		stateNewFirstName:            b.handleNewFirstName,
 		stateNewLastName:             b.handleNewLastName,
 		stateNewMiddleName:           b.handleNewMiddleName,
+		stateNewSubjectCallback:      b.handleNewSubjectCallback,
 		stateNewConfirmationCallback: b.handleNewConfirmationCallback,
 	}
 

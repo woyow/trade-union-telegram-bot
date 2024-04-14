@@ -16,6 +16,10 @@ type NewCommandMiddleNameStateServiceDTO struct {
 	HandleMessage
 }
 
+type NewCommandSubjectStateServiceDTO struct {
+	HandleCallback
+}
+
 type NewCommandConfirmationStateServiceDTO struct {
 	HandleCallback
 }

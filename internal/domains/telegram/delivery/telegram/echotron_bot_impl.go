@@ -45,7 +45,7 @@ func newBot(service service, log *logrus.Logger) func(chatID int64) echotron.Bot
 				}
 			}
 
-			bot.state = bot.handleMessage
+			bot.state = bot.handleDefault
 		} else {
 			m := bot.getChatStates()
 
@@ -55,7 +55,7 @@ func newBot(service service, log *logrus.Logger) func(chatID int64) echotron.Bot
 				bot.log.WithField(chatIDLoggingKey, bot.chatID).
 					Info("bot: newBot - Set " + chatCurrentState.State + " handler")
 			} else {
-				bot.state = bot.handleMessage
+				bot.state = bot.handleDefault
 				bot.log.WithField(chatIDLoggingKey, bot.chatID).
 					Info("bot: newBot - Set default handler")
 			}

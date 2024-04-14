@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"github.com/NicoNex/echotron/v3"
 	"github.com/sirupsen/logrus"
 	"trade-union-service/internal/domains/telegram/domain/entity"
 )
@@ -12,6 +11,13 @@ const (
 
 	markdownParseMode = "MarkdownV2"
 )
+
+type api interface {
+	SendMessage(dto entity.SendMessageApiDTO) error
+	SendMessageWithoutError(dto entity.SendMessageApiDTO)
+	SendMessageWithInlineKeyboard(dto entity.SendMessageWithInlineKeyboardApiDTO) error
+	SendMessageWithInlineKeyboardWithoutError(dto entity.SendMessageWithInlineKeyboardApiDTO)
+}
 
 type repo interface {
 	// State management
@@ -24,18 +30,18 @@ type repo interface {
 	CreateAppeal(ctx context.Context, dto entity.CreateAppealRepoDTO) (*entity.CreateAppealOut, error)
 	UpdateDraftAppeal(ctx context.Context, dto entity.UpdateAppealRepoDTO) error
 	GetDraftAppeal(ctx context.Context, dto entity.GetDraftAppealRepoDTO) (*entity.GetDraftAppealRepoOut, error)
-}
 
-type translateMap map[string]map[string]string
+	GetAppealSubjects(ctx context.Context, dto entity.GetAppealSubjectsRepoDTO) (entity.GetAppealSubjectsRepoOut, error)
+}
 
 type Service struct {
 	repo          repo
 	translateDict translateMap
-	api           *echotron.API
+	api           api
 	log           *logrus.Logger
 }
 
-func NewService(repo repo, api *echotron.API, log *logrus.Logger) *Service {
+func NewService(repo repo, api api, log *logrus.Logger) *Service {
 	return &Service{
 		repo:          repo,
 		translateDict: getTranslateMap(),

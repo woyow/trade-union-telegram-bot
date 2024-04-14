@@ -33,7 +33,7 @@ func NewMongoDB(ctx context.Context, cfg *Config, log *logrus.Logger) (*MongoDB,
 		Password:      cfg.Password,
 	}))
 	if err != nil {
-		log.Error("setup mongodb: NewMongoDB - mongo.Connect error: ", err.Error())
+		log.WithField("setup", "mongodb").Error("NewMongoDB - mongo.Connect error: ", err.Error())
 		return nil, err
 	}
 

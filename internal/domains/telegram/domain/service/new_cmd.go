@@ -3,8 +3,9 @@ package service
 import (
 	"context"
 	"fmt"
+	"math"
+	"strconv"
 
-	"github.com/NicoNex/echotron/v3"
 	"trade-union-service/internal/domains/telegram/domain/entity"
 	"trade-union-service/internal/domains/telegram/errs"
 )
@@ -13,10 +14,15 @@ func (s *Service) NewCommand(ctx context.Context, dto entity.NewCommandServiceDT
 	if err := s.deleteDraftAppeal(ctx, deleteDraftAppealDTO{
 		chatID: dto.ChatID,
 	}); err != nil {
-		if _, err := s.api.SendMessage(s.translate(somethingWentWrongTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+		if err := s.api.SendMessage(entity.SendMessageApiDTO{
+			Text:    s.translate(somethingWentWrongTranslateKey, dto.Lang),
+			ChatID:  dto.ChatID,
+			Options: nil,
+		}); err != nil {
 			s.log.WithField(chatIDLoggingKey, dto.ChatID).
 				Error("service: NewCommand - s.api.SendMessage error", err.Error())
 		}
+
 		return err
 	}
 
@@ -25,25 +31,39 @@ func (s *Service) NewCommand(ctx context.Context, dto entity.NewCommandServiceDT
 		isDraft: true,
 	})
 	if err != nil {
-		if _, err := s.api.SendMessage(s.translate(somethingWentWrongTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+		if err := s.api.SendMessage(entity.SendMessageApiDTO{
+			Text:    s.translate(somethingWentWrongTranslateKey, dto.Lang),
+			ChatID:  dto.ChatID,
+			Options: nil,
+		}); err != nil {
 			s.log.WithField(chatIDLoggingKey, dto.ChatID).
 				Error("service: NewCommand - s.api.SendMessage error", err.Error())
 		}
+
 		return err
 	}
 
 	s.log.WithField(chatIDLoggingKey, dto.ChatID).
 		Info("service: NewCommand - Draft appeal has been created with id: ", out.ID)
 
-	if _, err := s.api.SendMessage(s.translate(newCommandTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+	if err := s.api.SendMessage(entity.SendMessageApiDTO{
+		Text:    s.translate(newCommandTranslateKey, dto.Lang),
+		ChatID:  dto.ChatID,
+		Options: nil,
+	}); err != nil {
 		s.log.WithField(chatIDLoggingKey, dto.ChatID).
 			Error("service: NewCommand - s.api.SendMessage error", err.Error())
 	}
 
-	if _, err := s.api.SendMessage(s.translate(newCommandFirstNameTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+	if err := s.api.SendMessage(entity.SendMessageApiDTO{
+		Text:    s.translate(newCommandFirstNameTranslateKey, dto.Lang),
+		ChatID:  dto.ChatID,
+		Options: nil,
+	}); err != nil {
 		s.log.WithField(chatIDLoggingKey, dto.ChatID).
 			Error("service: NewCommand - s.api.SendMessage error", err.Error())
 	}
+
 	return nil
 }
 
@@ -92,7 +112,11 @@ func (s *Service) NewCommandFirstNameState(ctx context.Context, dto entity.NewCo
 		s.log.WithField(chatIDLoggingKey, dto.ChatID).
 			Error("service: NewCommandFirstNameState - s.repo.UpdateDraftAppeal error: ", err.Error())
 
-		if _, err := s.api.SendMessage(s.translate(somethingWentWrongTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+		if err := s.api.SendMessage(entity.SendMessageApiDTO{
+			Text:    s.translate(somethingWentWrongTranslateKey, dto.Lang),
+			ChatID:  dto.ChatID,
+			Options: nil,
+		}); err != nil {
 			s.log.WithField(chatIDLoggingKey, dto.ChatID).
 				Error("service: NewCommandFirstNameState - s.api.SendMessage error", err.Error())
 		}
@@ -100,10 +124,15 @@ func (s *Service) NewCommandFirstNameState(ctx context.Context, dto entity.NewCo
 		return err
 	}
 
-	if _, err := s.api.SendMessage(s.translate(newCommandLastNameTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+	if err := s.api.SendMessage(entity.SendMessageApiDTO{
+		Text:    s.translate(newCommandLastNameTranslateKey, dto.Lang),
+		ChatID:  dto.ChatID,
+		Options: nil,
+	}); err != nil {
 		s.log.WithField(chatIDLoggingKey, dto.ChatID).
 			Error("service: NewCommandFirstNameState - s.api.SendMessage error", err.Error())
 	}
+
 	return nil
 }
 
@@ -117,7 +146,11 @@ func (s *Service) NewCommandLastNameState(ctx context.Context, dto entity.NewCom
 		s.log.WithField(chatIDLoggingKey, dto.ChatID).
 			Error("service: NewCommandLastNameState - s.repo.UpdateDraftAppeal error: ", err.Error())
 
-		if _, err := s.api.SendMessage(s.translate(somethingWentWrongTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+		if err := s.api.SendMessage(entity.SendMessageApiDTO{
+			Text:    s.translate(somethingWentWrongTranslateKey, dto.Lang),
+			ChatID:  dto.ChatID,
+			Options: nil,
+		}); err != nil {
 			s.log.WithField(chatIDLoggingKey, dto.ChatID).
 				Error("service: NewCommandLastNameState - s.api.SendMessage error", err.Error())
 		}
@@ -125,11 +158,55 @@ func (s *Service) NewCommandLastNameState(ctx context.Context, dto entity.NewCom
 		return err
 	}
 
-	if _, err := s.api.SendMessage(s.translate(newCommandMiddleNameTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+	if err := s.api.SendMessage(entity.SendMessageApiDTO{
+		Text:    s.translate(newCommandMiddleNameTranslateKey, dto.Lang),
+		ChatID:  dto.ChatID,
+		Options: nil,
+	}); err != nil {
 		s.log.WithField(chatIDLoggingKey, dto.ChatID).
 			Error("service: NewCommandLastNameState - s.api.SendMessage error", err.Error())
 	}
+
 	return nil
+}
+
+type getButtonsDTO struct {
+	buttons          []entity.InlineButton
+	maxButtonsOnLine int
+}
+
+func (s *Service) getButtons(dto getButtonsDTO) [][]entity.InlineButton {
+	lines := make([][]entity.InlineButton, 0, int(math.Ceil(float64(len(dto.buttons)/dto.maxButtonsOnLine))))
+
+	for i := 0; i < len(dto.buttons); i++ {
+		buttons := make([]entity.InlineButton, 0, dto.maxButtonsOnLine)
+
+		buttonsOnLine := func() int {
+			if len(dto.buttons)-i >= dto.maxButtonsOnLine {
+				return dto.maxButtonsOnLine
+			} else {
+				return len(dto.buttons) - i
+			}
+		}()
+
+		for j := 0; j < buttonsOnLine; j++ {
+			s.log.Debug("dto.buttons[i].Text: ", dto.buttons[i].Text)
+
+			buttons = append(buttons, entity.InlineButton{
+				Text:         strconv.Itoa(i + 1),
+				CallbackData: dto.buttons[i].CallbackData,
+				URL:          dto.buttons[i].URL,
+			})
+
+			if j != buttonsOnLine-1 {
+				i++
+			}
+		}
+
+		lines = append(lines, buttons)
+	}
+
+	return lines
 }
 
 func (s *Service) NewCommandMiddleNameState(ctx context.Context, dto entity.NewCommandMiddleNameStateServiceDTO) error {
@@ -142,7 +219,92 @@ func (s *Service) NewCommandMiddleNameState(ctx context.Context, dto entity.NewC
 		s.log.WithField(chatIDLoggingKey, dto.ChatID).
 			Error("service: NewCommandLastNameState - s.repo.UpdateDraftAppeal error: ", err.Error())
 
-		if _, err := s.api.SendMessage(s.translate(somethingWentWrongTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+		if err := s.api.SendMessage(entity.SendMessageApiDTO{
+			Text:    s.translate(somethingWentWrongTranslateKey, dto.Lang),
+			ChatID:  dto.ChatID,
+			Options: nil,
+		}); err != nil {
+			s.log.WithField(chatIDLoggingKey, dto.ChatID).
+				Error("service: NewCommandLastNameState - s.api.SendMessage error", err.Error())
+		}
+
+		return err
+	}
+
+	isActiveSubjects := true
+
+	subjects, err := s.repo.GetAppealSubjects(ctx, entity.GetAppealSubjectsRepoDTO{
+		ChatID:   dto.ChatID,
+		IsActive: &isActiveSubjects,
+	})
+	if err != nil {
+		s.log.WithField(chatIDLoggingKey, dto.ChatID).
+			Error("service: NewCommandMiddleNameState - s.repo.GetAppealSubjects error: ", err.Error())
+
+		if err := s.api.SendMessage(entity.SendMessageApiDTO{
+			Text:    s.translate(somethingWentWrongTranslateKey, dto.Lang),
+			ChatID:  dto.ChatID,
+			Options: nil,
+		}); err != nil {
+			s.log.WithField(chatIDLoggingKey, dto.ChatID).
+				Error("service: NewCommandMiddleNameState - s.api.SendMessage error", err.Error())
+		}
+
+		return err
+	}
+
+	buttons := s.getButtons(getButtonsDTO{
+		buttons: func() []entity.InlineButton {
+			buttons := make([]entity.InlineButton, 0, len(subjects))
+
+			for i := range subjects {
+				buttons = append(buttons, entity.InlineButton{
+					Text:         subjects[i].Text[dto.Lang],
+					CallbackData: subjects[i].CallbackData,
+					URL:          "",
+				})
+			}
+
+			return buttons
+		}(),
+		maxButtonsOnLine: 5,
+	})
+
+	if err := s.api.SendMessageWithInlineKeyboard(entity.SendMessageWithInlineKeyboardApiDTO{
+		Text: s.translate(newCommandChooseSubjectOfAppealTranslateKey, dto.Lang) +
+			"\n\n" +
+			func() string {
+				var text string
+				for i := range subjects {
+					text += fmt.Sprintf("%d. %s\n", i+1, subjects[i].Text[dto.Lang])
+				}
+				return text
+			}(),
+		ChatID:  dto.ChatID,
+		Buttons: buttons,
+	}); err != nil {
+		s.log.WithField(chatIDLoggingKey, dto.ChatID).
+			Error("service: NewCommandMiddleNameState - s.api.SendMessage error", err.Error())
+	}
+
+	return nil
+}
+
+func (s *Service) NewCommandSubjectState(ctx context.Context, dto entity.NewCommandSubjectStateServiceDTO) error {
+	if err := s.repo.UpdateDraftAppeal(ctx, entity.UpdateAppealRepoDTO{
+		UpdateAppealBase: entity.UpdateAppealBase{
+			Subject: &dto.Data,
+		},
+		ChatID: dto.ChatID,
+	}); err != nil {
+		s.log.WithField(chatIDLoggingKey, dto.ChatID).
+			Error("service: NewCommandLastNameState - s.repo.UpdateDraftAppeal error: ", err.Error())
+
+		if err := s.api.SendMessage(entity.SendMessageApiDTO{
+			Text:    s.translate(somethingWentWrongTranslateKey, dto.Lang),
+			ChatID:  dto.ChatID,
+			Options: nil,
+		}); err != nil {
 			s.log.WithField(chatIDLoggingKey, dto.ChatID).
 				Error("service: NewCommandLastNameState - s.api.SendMessage error", err.Error())
 		}
@@ -157,7 +319,11 @@ func (s *Service) NewCommandMiddleNameState(ctx context.Context, dto entity.NewC
 		s.log.WithField(chatIDLoggingKey, dto.ChatID).
 			Error("service: NewCommandLastNameState - s.repo.GetDraftAppeal error: ", err.Error())
 
-		if _, err := s.api.SendMessage(s.translate(somethingWentWrongTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+		if err := s.api.SendMessage(entity.SendMessageApiDTO{
+			Text:    s.translate(somethingWentWrongTranslateKey, dto.Lang),
+			ChatID:  dto.ChatID,
+			Options: nil,
+		}); err != nil {
 			s.log.WithField(chatIDLoggingKey, dto.ChatID).
 				Error("service: NewCommandLastNameState - s.api.SendMessage error", err.Error())
 		}
@@ -187,15 +353,22 @@ type sendFinalAppealDTO struct {
 
 func (s *Service) sendFinalAppeal(dto sendFinalAppealDTO) error {
 	var text string
+
 	text += fmt.Sprintf(
 		"*%s*: `%s %s %s`\n"+
-			"*%s*: `Неизвестная тема обращения`",
+			"*%s*: `%s`",
 		s.translate(newCommandFullNameTranslateKey, dto.lang), dto.appeal.Lname, dto.appeal.Fname, dto.appeal.Mname,
-		s.translate(newCommandSubjectTranslateKey, dto.lang),
+		s.translate(newCommandSubjectTranslateKey, dto.lang), dto.appeal.Subject,
 	)
 
-	if _, err := s.api.SendMessage(text, dto.chatID, &echotron.MessageOptions{
-		ParseMode: markdownParseMode,
+	parseMode := markdownParseMode
+
+	if err := s.api.SendMessage(entity.SendMessageApiDTO{
+		Text:   text,
+		ChatID: dto.chatID,
+		Options: &entity.Options{
+			ParseMode: &parseMode,
+		},
 	}); err != nil {
 		s.log.WithField(chatIDLoggingKey, dto.chatID).
 			Error("service: NewCommandLastNameState - s.api.SendMessage error", err.Error())
@@ -210,18 +383,20 @@ type sendConfirmDTO struct {
 }
 
 func (s *Service) sendConfirm(dto sendConfirmDTO) error {
-	if _, err := s.api.SendMessage(s.translate(newCommandConfirmSendAppealTranslateKey, dto.lang), dto.chatID, &echotron.MessageOptions{
-		ReplyMarkup: echotron.InlineKeyboardMarkup{
-			InlineKeyboard: [][]echotron.InlineKeyboardButton{
+	if err := s.api.SendMessageWithInlineKeyboard(entity.SendMessageWithInlineKeyboardApiDTO{
+		Text:   s.translate(newCommandConfirmSendAppealTranslateKey, dto.lang),
+		ChatID: dto.chatID,
+		Buttons: [][]entity.InlineButton{
+			{
 				{
-					{
-						Text:         s.translate(newCommandSendConfirmOkButtonTranslateKey, dto.lang),
-						CallbackData: confirmCallbackOk,
-					},
-					{
-						Text:         s.translate(newCommandSendConfirmCancelButtonTranslateKey, dto.lang),
-						CallbackData: confirmCallbackCancel,
-					},
+					Text:         s.translate(newCommandSendConfirmOkButtonTranslateKey, dto.lang),
+					CallbackData: confirmCallbackOk,
+					URL:          "",
+				},
+				{
+					Text:         s.translate(newCommandSendConfirmCancelButtonTranslateKey, dto.lang),
+					CallbackData: confirmCallbackCancel,
+					URL:          "",
 				},
 			},
 		},
@@ -251,7 +426,11 @@ func (s *Service) NewCommandConfirmationState(ctx context.Context, dto entity.Ne
 			s.log.WithField(chatIDLoggingKey, dto.ChatID).
 				Error("service: NewCommandConfirmationState - s.repo.UpdateDraftAppeal error: ", err.Error())
 
-			if _, err := s.api.SendMessage(s.translate(somethingWentWrongTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+			if err := s.api.SendMessage(entity.SendMessageApiDTO{
+				Text:    s.translate(somethingWentWrongTranslateKey, dto.Lang),
+				ChatID:  dto.ChatID,
+				Options: nil,
+			}); err != nil {
 				s.log.WithField(chatIDLoggingKey, dto.ChatID).
 					Error("service: NewCommandConfirmationState - s.api.SendMessage error", err.Error())
 			}
@@ -259,7 +438,11 @@ func (s *Service) NewCommandConfirmationState(ctx context.Context, dto entity.Ne
 			return err
 		}
 
-		if _, err := s.api.SendMessage(s.translate(newCommandConfirmAppealCreatedTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+		if err := s.api.SendMessage(entity.SendMessageApiDTO{
+			Text:    s.translate(newCommandConfirmAppealCreatedTranslateKey, dto.Lang),
+			ChatID:  dto.ChatID,
+			Options: nil,
+		}); err != nil {
 			s.log.WithField(chatIDLoggingKey, dto.ChatID).
 				Error("service: NewCommandConfirmationState - s.api.SendMessage error", err.Error())
 		}
@@ -272,7 +455,11 @@ func (s *Service) NewCommandConfirmationState(ctx context.Context, dto entity.Ne
 			s.log.WithField(chatIDLoggingKey, dto.ChatID).
 				Error("service: NewCommandConfirmationState - s.repo.DeleteDraftAppeal error: ", err.Error())
 
-			if _, err := s.api.SendMessage(s.translate(somethingWentWrongTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+			if err := s.api.SendMessage(entity.SendMessageApiDTO{
+				Text:    s.translate(somethingWentWrongTranslateKey, dto.Lang),
+				ChatID:  dto.ChatID,
+				Options: nil,
+			}); err != nil {
 				s.log.WithField(chatIDLoggingKey, dto.ChatID).
 					Error("service: NewCommandConfirmationState - s.api.SendMessage error", err.Error())
 			}
@@ -280,17 +467,26 @@ func (s *Service) NewCommandConfirmationState(ctx context.Context, dto entity.Ne
 			return err
 		}
 
-		if _, err := s.api.SendMessage(s.translate(newCommandConfirmAppealCanceledTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+		if err := s.api.SendMessage(entity.SendMessageApiDTO{
+			Text:    s.translate(newCommandConfirmAppealCanceledTranslateKey, dto.Lang),
+			ChatID:  dto.ChatID,
+			Options: nil,
+		}); err != nil {
 			s.log.WithField(chatIDLoggingKey, dto.ChatID).
 				Error("service: NewCommandConfirmationState - s.api.SendMessage error", err.Error())
 		}
 
 		return nil
 	default:
-		if _, err := s.api.SendMessage(s.translate(newCommandConfirmAnswerNotExistsTranslateKey, dto.Lang), dto.ChatID, nil); err != nil {
+		if err := s.api.SendMessage(entity.SendMessageApiDTO{
+			Text:    s.translate(newCommandConfirmAnswerNotExistsTranslateKey, dto.Lang),
+			ChatID:  dto.ChatID,
+			Options: nil,
+		}); err != nil {
 			s.log.WithField(chatIDLoggingKey, dto.ChatID).
 				Error("service: NewCommandConfirmationState - s.api.SendMessage error", err.Error())
 		}
+
 		return errs.ErrUnknownAnswer
 	}
 }

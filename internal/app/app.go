@@ -15,6 +15,7 @@ import (
 	setupLogger "trade-union-service/internal/setup/logger"
 	setupMongoDB "trade-union-service/internal/setup/mongodb"
 	setupRedis "trade-union-service/internal/setup/redis"
+	setupVictoriaMetrics "trade-union-service/internal/setup/victoria-metrics"
 
 	mongoDBMigrate "trade-union-service/internal/setup/mongodb/migrate"
 
@@ -109,6 +110,11 @@ func (a *app) Run() error {
 	{
 		telegram.NewDomain(a.setup.mongodb, a.setup.echotron, a.log)
 		users.NewDomain(a.setup.mongodb, a.setup.fiber, a.log)
+	}
+
+	// Ititialize metrics
+	{
+		setupVictoriaMetrics.NewVictoriaMetrics(a.log)
 	}
 
 	// Handle stop program

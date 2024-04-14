@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	appealsCollection = "appeals"
+	appealsCollection        = "appeals"
+	appealSubjectsCollection = "appealSubjects"
 )
 
 func (r *RepoImpl) DeleteDraftAppeal(ctx context.Context, dto entity.DeleteDraftAppealRepoDTO) error {
@@ -77,6 +78,13 @@ func (r *RepoImpl) UpdateDraftAppeal(ctx context.Context, dto entity.UpdateAppea
 		})
 	}
 
+	if dto.Subject != nil {
+		update = append(update, bson.E{
+			Key:   "$set",
+			Value: bson.D{{"subject", *dto.Subject}},
+		})
+	}
+
 	if dto.IsDraft != nil {
 		update = append(update, bson.E{
 			Key:   "$set",
@@ -116,4 +124,40 @@ func (r *RepoImpl) GetDraftAppeal(ctx context.Context, dto entity.GetDraftAppeal
 	}
 
 	return &out, nil
+}
+
+func (r *RepoImpl) GetAppealSubjects(ctx context.Context, dto entity.GetAppealSubjectsRepoDTO) (entity.GetAppealSubjectsRepoOut, error) {
+	filter := make(bson.D, 0, 1)
+
+	if dto.IsActive != nil {
+		filter = append(filter, bson.E{
+			Key:   "isActive",
+			Value: *dto.IsActive,
+		})
+	}
+
+	cur, err := r.db.Database(tradeUnionDatabase).
+		Collection(appealSubjectsCollection).
+		Find(ctx, filter)
+	if err != nil {
+		r.log.WithField(chatIDLoggingKey, dto.ChatID).
+			Error("repo: GetAppealSubjects query error: ", err.Error())
+
+		return nil, err
+	}
+
+	var out entity.GetAppealSubjectsRepoOut
+
+	if err := cur.All(ctx, &out); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, err
+		}
+
+		r.log.WithField(chatIDLoggingKey, dto.ChatID).
+			Error("repo: GetAppealSubjects - res.Decode error: ", err.Error())
+
+		return nil, err
+	}
+
+	return out, nil
 }

@@ -5,10 +5,14 @@ import (
 )
 
 func (s *Service) UnknownCommand(dto entity.UnknownCommandServiceDTO) error {
-	_, err := s.api.SendMessage(s.translate(unknownCommandTranslateKey, dto.Lang), dto.ChatID, nil)
-	if err != nil {
+	if err := s.api.SendMessage(entity.SendMessageApiDTO{
+		Text:    s.translate(unknownCommandTranslateKey, dto.Lang),
+		ChatID:  dto.ChatID,
+		Options: nil,
+	}); err != nil {
 		s.log.WithField(chatIDLoggingKey, dto.ChatID).
 			Error("service: UnknownCommand - s.api.SendMessage error", err.Error())
 	}
+
 	return nil
 }

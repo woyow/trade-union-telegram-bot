@@ -17,6 +17,7 @@ type UpdateAppealBase struct {
 	Fname   *string
 	Lname   *string
 	Mname   *string
+	Subject *string
 	IsDraft *bool
 }
 
@@ -30,7 +31,22 @@ type GetDraftAppealRepoDTO struct {
 }
 
 type GetDraftAppealRepoOut struct {
-	Fname string `bson:"fname"`
-	Lname string `bson:"lname"`
-	Mname string `bson:"mname"`
+	Fname   string `bson:"fname"`
+	Lname   string `bson:"lname"`
+	Mname   string `bson:"mname"`
+	Subject string `bson:"subject"`
 }
+
+type GetAppealSubjectsRepoDTO struct {
+	ChatID   int64
+	IsActive *bool
+}
+
+type Localization map[string]string
+
+type GetAppealSubjectRepoOut struct {
+	Text         Localization `bson:"text"`
+	CallbackData string       `bson:"callbackData"`
+}
+
+type GetAppealSubjectsRepoOut []GetAppealSubjectRepoOut
