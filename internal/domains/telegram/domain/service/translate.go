@@ -1,5 +1,7 @@
 package service
 
+import "trade-union-service/internal/domains/telegram/domain/entity"
+
 const (
 	langEn = "en"
 	langRu = "ru"
@@ -17,9 +19,7 @@ const (
 
 	// New command translate keys.
 	newCommandTranslateKey                        = "new_cmd.message"
-	newCommandFirstNameTranslateKey               = "new_cmd.type_first_name.message"
-	newCommandLastNameTranslateKey                = "new_cmd.type_last_name.message"
-	newCommandMiddleNameTranslateKey              = "new_cmd.type_middle_name.message"
+	newCommandTypeFullNameTranslateKey            = "new_cmd.type_full_name.message"
 	newCommandChooseSubjectOfAppealTranslateKey   = "new_cmd.type_choose_appeal_subject.text"
 	newCommandFullNameTranslateKey                = "new_cmd.full_name.text"
 	newCommandSubjectTranslateKey                 = "new_cmd.subject_of_appeal.text"
@@ -51,17 +51,9 @@ func getTranslateMap() translateMap {
 			langEn: "To create a new request, the bot needs some data. Please enter them.",
 			langRu: "Для создания нового обращения боту необходимы некоторые данные. Пожалуйста, введите их.",
 		},
-		newCommandFirstNameTranslateKey: map[string]string{
-			langEn: "Enter your name:",
-			langRu: "Введите имя:",
-		},
-		newCommandLastNameTranslateKey: map[string]string{
-			langEn: "Enter last name:",
-			langRu: "Введите фамилию:",
-		},
-		newCommandMiddleNameTranslateKey: map[string]string{
-			langEn: "Enter middle name:",
-			langRu: "Введите отчество:",
+		newCommandTypeFullNameTranslateKey: map[string]string{
+			langEn: "Enter your full name:",
+			langRu: "Введите свое полное имя (ФИО):",
 		},
 		newCommandChooseSubjectOfAppealTranslateKey: map[string]string{
 			langEn: "Select the subject of your appeal:",
@@ -117,6 +109,21 @@ func (s *Service) translate(key, lang string) string {
 	}
 
 	val, ok := s.translateDict[key][lang]
+	if !ok {
+		return translateNotExists
+	}
+
+	return val
+}
+
+func (s *Service) translateLocalization(localization entity.Localization, lang string) string {
+	switch lang {
+	case langEn, langRu:
+	default:
+		lang = defaultLang
+	}
+
+	val, ok := localization[lang]
 	if !ok {
 		return translateNotExists
 	}

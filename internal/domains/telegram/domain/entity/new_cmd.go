@@ -4,15 +4,7 @@ type NewCommandServiceDTO struct {
 	HandleCommand
 }
 
-type NewCommandFirstNameStateServiceDTO struct {
-	HandleMessage
-}
-
-type NewCommandLastNameStateServiceDTO struct {
-	HandleMessage
-}
-
-type NewCommandMiddleNameStateServiceDTO struct {
+type NewCommandFullNameStateServiceDTO struct {
 	HandleMessage
 }
 

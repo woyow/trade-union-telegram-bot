@@ -12,6 +12,7 @@ import (
 	"trade-union-service/internal/setup/logger"
 	"trade-union-service/internal/setup/mongodb"
 	"trade-union-service/internal/setup/redis"
+	victoriaMetrics "trade-union-service/internal/setup/victoria-metrics"
 
 	goEnv "github.com/Netflix/go-env"
 	"github.com/joho/godotenv"
@@ -24,13 +25,14 @@ const (
 
 // Config - Aggregate configurations for application.
 type Config struct {
-	App      app.Config      `yaml:"app"`
-	HTTP     http.Config     `yaml:"http"`
-	Fiber    fiber.Config    `yaml:"fiber"`
-	Logger   logger.Config   `yaml:"logger"`
-	Redis    redis.Config    `yaml:"redis"`
-	MongoDB  mongodb.Config  `yaml:"mongodb"`
-	Echotron echotron.Config `yaml:"-"`
+	App             app.Config             `yaml:"app"`
+	HTTP            http.Config            `yaml:"http"`
+	Fiber           fiber.Config           `yaml:"fiber"`
+	Logger          logger.Config          `yaml:"logger"`
+	Redis           redis.Config           `yaml:"redis"`
+	MongoDB         mongodb.Config         `yaml:"mongodb"`
+	Echotron        echotron.Config        `yaml:"-"`
+	VictoriaMetrics victoriaMetrics.Config `yaml:"victoria_metrics"`
 }
 
 // NewConfig - Returns *Config.

@@ -3,6 +3,7 @@ package mongodb
 import (
 	"context"
 	"errors"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,7 +13,7 @@ import (
 )
 
 const (
-	errUserAlreadyExists = "tradeUnion.chatStates index: chatId_1 dup key"
+	errChatStateAlreadyExists = "tradeUnion.chatStates index: chatId_1 dup key"
 )
 
 func (r *RepoImpl) CreateChatCurrentState(ctx context.Context, dto entity.CreateChatCurrentStateRepoDTO) (*entity.CreateChatCurrentStateOut, error) {
@@ -25,11 +26,16 @@ func (r *RepoImpl) CreateChatCurrentState(ctx context.Context, dto entity.Create
 		Collection(chatStatesCollection).
 		InsertOne(ctx, doc)
 	if err != nil {
-		if strings.Contains(err.Error(), errUserAlreadyExists) {
+		if strings.Contains(err.Error(), errChatStateAlreadyExists) {
 			return nil, errs.ErrChatCurrentStateAlreadyExists
 		}
 
-		r.log.Error("mongo: CreateChatCurrentState query error: ", err.Error())
+		r.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: dto.ChatID,
+			domainLoggingKey: domainLoggingValue,
+			infraLoggingKey:  indraLoggingValue,
+		}).Error("CreateChatCurrentState query error: ", err.Error())
+
 		return nil, err
 	}
 
@@ -48,7 +54,12 @@ func (r *RepoImpl) SetChatCurrentState(ctx context.Context, dto entity.SetChatCu
 		Collection(chatStatesCollection).
 		UpdateOne(ctx, filter, update)
 	if err != nil {
-		r.log.Error("mongo: SetChatCurrentState query error: ", err.Error())
+		r.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: dto.ChatID,
+			domainLoggingKey: domainLoggingValue,
+			infraLoggingKey:  indraLoggingValue,
+		}).Error("SetChatCurrentState query error: ", err.Error())
+
 		return err
 	}
 
@@ -69,8 +80,12 @@ func (r *RepoImpl) GetChatCurrentState(ctx context.Context, dto entity.GetChatCu
 			return nil, errs.ErrChatCurrentStateNotExists
 		}
 
-		r.log.WithField(chatIDLoggingKey, dto.ChatID).
-			Error("repo: GetChatCurrentState - res.Decode error: ", err.Error())
+		r.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: dto.ChatID,
+			domainLoggingKey: domainLoggingValue,
+			infraLoggingKey:  indraLoggingValue,
+		}).Error("GetChatCurrentState - res.Decode error: ", err.Error())
+
 		return nil, err
 	}
 

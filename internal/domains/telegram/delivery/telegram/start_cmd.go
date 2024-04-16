@@ -3,6 +3,7 @@ package telegram
 import (
 	"context"
 	"time"
+	"trade-union-service/internal/domains/telegram/metrics"
 
 	"trade-union-service/internal/domains/telegram/domain/entity"
 
@@ -10,6 +11,9 @@ import (
 )
 
 func (b *bot) handleStartCommand(update *echotron.Update) StateFn {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
 	if err := b.service.StartCommand(entity.StartCommandServiceDTO{
 		HandleCommand: entity.HandleCommand{
 			Lang:   update.Message.From.LanguageCode,
@@ -18,11 +22,11 @@ func (b *bot) handleStartCommand(update *echotron.Update) StateFn {
 	}); err != nil {
 		b.log.WithField(chatIDLoggingKey, b.chatID).
 			Error("bot: handleStartCommand error: ", err.Error())
-		return b.handleDefault
-	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
+		metrics.IncrementErrorTotal()
+
+		return b.setState(ctx, stateDefault, b.handleDefault)
+	}
 
 	return b.setState(ctx, stateDefault, b.handleDefault)
 }

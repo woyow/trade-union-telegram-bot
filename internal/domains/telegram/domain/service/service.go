@@ -7,16 +7,17 @@ import (
 )
 
 const (
-	chatIDLoggingKey = "chatID"
-
-	markdownParseMode = "MarkdownV2"
+	chatIDLoggingKey   = "chat_id"
+	domainLoggingKey   = "domain"
+	domainLoggingValue = "telegram"
+	layerLoggingKey    = "layer"
+	layerLoggingValue  = "service"
+	markdownParseMode  = "MarkdownV2"
 )
 
 type api interface {
-	SendMessage(dto entity.SendMessageApiDTO) error
-	SendMessageWithoutError(dto entity.SendMessageApiDTO)
-	SendMessageWithInlineKeyboard(dto entity.SendMessageWithInlineKeyboardApiDTO) error
-	SendMessageWithInlineKeyboardWithoutError(dto entity.SendMessageWithInlineKeyboardApiDTO)
+	SendMessage(dto entity.SendMessageAPIDTO) error
+	SendMessageWithInlineKeyboard(dto entity.SendMessageWithInlineKeyboardAPIDTO) error
 }
 
 type repo interface {

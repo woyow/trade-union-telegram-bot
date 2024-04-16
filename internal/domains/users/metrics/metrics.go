@@ -1,9 +1,11 @@
 package metrics
 
 import (
-	"github.com/VictoriaMetrics/metrics"
+	setupVictoriaMetrics "trade-union-service/internal/setup/victoria-metrics"
 )
 
-var (
-	TestMetric = metrics.NewCounter("test")
-)
+var metricsEnabled bool
+
+func ConfigureMetrics(cfg *setupVictoriaMetrics.Config) {
+	metricsEnabled = cfg.MetricsEnabled
+}

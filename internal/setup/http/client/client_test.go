@@ -2,11 +2,12 @@ package client
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 const (

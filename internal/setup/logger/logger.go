@@ -4,6 +4,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	levelLoggingKey = "level"
+)
+
 func NewLogger(cfg *Config) *logrus.Logger {
 	logger := logrus.StandardLogger()
 
@@ -17,7 +21,9 @@ func NewLogger(cfg *Config) *logrus.Logger {
 	// Possible logLevel value: "panic", "fatal", "error", "warn" or "warning", "info", "debug", "trace"
 	level, err := logrus.ParseLevel(cfg.Level)
 	if err != nil {
-		logger.WithError(err).WithField("level", cfg.Level).Warn("cannot parse a logging level")
+		logger.WithError(err).
+			WithField(levelLoggingKey, cfg.Level).
+			Warn("cannot parse a logging level")
 	} else {
 		logger.SetLevel(level)
 	}

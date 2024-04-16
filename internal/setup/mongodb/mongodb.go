@@ -10,8 +10,12 @@ import (
 )
 
 const (
+	setupLoggingKey   = "setup"
+	setupLoggingValue = "mongodb"
+
 	proto            = "mongodb://"
 	addressSeparator = ":"
+	authMechanism    = "SCRAM-SHA-1"
 )
 
 type MongoDB struct {
@@ -24,21 +28,31 @@ func NewMongoDB(ctx context.Context, cfg *Config, log *logrus.Logger) (*MongoDB,
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 
 	mongoURI := proto + cfg.Host + addressSeparator + cfg.Port
-	log.Debug("mongoURI: ", mongoURI)
+
+	log.WithField(setupLoggingKey, setupLoggingValue).
+		Debug("mongoURI: ", mongoURI)
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI).SetAuth(options.Credential{
-		AuthMechanism: "SCRAM-SHA-1",
+		AuthMechanism: authMechanism,
 		AuthSource:    cfg.AuthSource,
 		Username:      cfg.Username,
 		Password:      cfg.Password,
 	}))
 	if err != nil {
-		log.WithField("setup", "mongodb").Error("NewMongoDB - mongo.Connect error: ", err.Error())
+		log.WithField(setupLoggingKey, setupLoggingValue).
+			Error("NewMongoDB - mongo.Connect error: ", err.Error())
+
+		cancel()
+
 		return nil, err
 	}
 
 	if err := client.Ping(ctx, nil); err != nil {
-		log.Error("setup mongodb: NewMongoDB - client.Ping error: ", err.Error())
+		log.WithField(setupLoggingKey, setupLoggingValue).
+			Error("NewMongoDB - client.Ping error: ", err.Error())
+
+		cancel()
+
 		return nil, err
 	}
 

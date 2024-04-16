@@ -4,7 +4,7 @@ type Options struct {
 	ParseMode *string
 }
 
-type SendMessageApiDTO struct {
+type SendMessageAPIDTO struct {
 	Text    string
 	ChatID  int64
 	Options *Options
@@ -16,7 +16,7 @@ type InlineButton struct {
 	URL          string
 }
 
-type SendMessageWithInlineKeyboardApiDTO struct {
+type SendMessageWithInlineKeyboardAPIDTO struct {
 	Text    string
 	ChatID  int64
 	Buttons [][]InlineButton

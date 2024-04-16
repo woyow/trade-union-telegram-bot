@@ -12,6 +12,7 @@ func (s *Service) GetUser(ctx context.Context, dto entity.GetUserServiceDTO) (*e
 	})
 	if err != nil {
 		s.log.Error("service: GetUser - s.repo.GetUser error: ", err.Error())
+
 		return nil, err
 	}
 

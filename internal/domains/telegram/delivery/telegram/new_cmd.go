@@ -3,9 +3,11 @@ package telegram
 import (
 	"context"
 	"github.com/NicoNex/echotron/v3"
+	"github.com/sirupsen/logrus"
 	"time"
 	"trade-union-service/internal/domains/telegram/domain/entity"
 	"trade-union-service/internal/domains/telegram/errs"
+	"trade-union-service/internal/domains/telegram/metrics"
 )
 
 func (b *bot) handleNewCommand(update *echotron.Update) StateFn {
@@ -18,78 +20,45 @@ func (b *bot) handleNewCommand(update *echotron.Update) StateFn {
 			ChatID: b.chatID,
 		},
 	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).
-			Error("bot: handleNewCommand - b.service.NewCommand error: ", err.Error())
+		b.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: b.chatID,
+			domainLoggingKey: domainLoggingValue,
+			layerLoggingKey:  layerLoggingValue,
+		}).Error("handleNewCommand - b.service.NewCommand error: ", err.Error())
+
+		metrics.IncrementErrorTotal()
 
 		return b.setState(ctx, stateDefault, b.handleDefault)
 	}
 
-	return b.setState(ctx, stateNewFirstName, b.handleNewFirstName)
+	return b.setState(ctx, stateNewFullName, b.handleNewFullName)
 }
 
-func (b *bot) handleNewFirstName(update *echotron.Update) StateFn {
+func (b *bot) handleNewFullName(update *echotron.Update) StateFn {
+	metrics.IncrementMessageTotal()
+
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	if update.Message == nil {
-		return b.setState(ctx, stateNewFirstName, b.handleNewFirstName)
+		return b.setState(ctx, stateNewFullName, b.handleNewFullName)
 	}
 
-	if err := b.service.NewCommandFirstNameState(ctx, entity.NewCommandFirstNameStateServiceDTO{
+	if err := b.service.NewCommandFullNameState(ctx, entity.NewCommandFullNameStateServiceDTO{
 		HandleMessage: entity.HandleMessage{
 			Lang:   update.Message.From.LanguageCode,
 			ChatID: b.chatID,
 			Text:   update.Message.Text,
 		},
 	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).
-			Error("bot: handleNewFirstName - b.service.NewCommandFirstNameState error: ", err.Error())
-		return b.setState(ctx, stateDefault, b.handleDefault)
-	}
+		b.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: b.chatID,
+			domainLoggingKey: domainLoggingValue,
+			layerLoggingKey:  layerLoggingValue,
+		}).Error("handleNewFullName - b.service.NewCommandFullNameState error: ", err.Error())
 
-	return b.setState(ctx, stateNewLastName, b.handleNewLastName)
-}
+		metrics.IncrementErrorTotal()
 
-func (b *bot) handleNewLastName(update *echotron.Update) StateFn {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
-
-	if update.Message == nil {
-		return b.setState(ctx, stateNewLastName, b.handleNewLastName)
-	}
-
-	if err := b.service.NewCommandLastNameState(ctx, entity.NewCommandLastNameStateServiceDTO{
-		HandleMessage: entity.HandleMessage{
-			Lang:   update.Message.From.LanguageCode,
-			ChatID: b.chatID,
-			Text:   update.Message.Text,
-		},
-	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).
-			Error("bot: handleNewLastName - b.service.NewCommandLastNameStateerror: ", err.Error())
-		return b.setState(ctx, stateDefault, b.handleDefault)
-	}
-
-	return b.setState(ctx, stateNewMiddleName, b.handleNewMiddleName)
-}
-
-func (b *bot) handleNewMiddleName(update *echotron.Update) StateFn {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
-
-	if update.Message == nil {
-		return b.setState(ctx, stateNewMiddleName, b.handleNewMiddleName)
-	}
-
-	if err := b.service.NewCommandMiddleNameState(ctx, entity.NewCommandMiddleNameStateServiceDTO{
-		HandleMessage: entity.HandleMessage{
-			Lang:   update.Message.From.LanguageCode,
-			ChatID: b.chatID,
-			Text:   update.Message.Text,
-		},
-	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).
-			Error("bot: handleNewLastName - b.service.NewCommandMiddleNameState error: ", err.Error())
 		return b.setState(ctx, stateDefault, b.handleDefault)
 	}
 
@@ -97,6 +66,8 @@ func (b *bot) handleNewMiddleName(update *echotron.Update) StateFn {
 }
 
 func (b *bot) handleNewSubjectCallback(update *echotron.Update) StateFn {
+	metrics.IncrementCallbackQueryTotal()
+
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
@@ -115,21 +86,28 @@ func (b *bot) handleNewSubjectCallback(update *echotron.Update) StateFn {
 			ChatID: b.chatID,
 		},
 	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).
-			Error("bot: handleNewSubjectCallback - b.service.NewCommandSubjectState error: ", err.Error())
+		b.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: b.chatID,
+			domainLoggingKey: domainLoggingValue,
+			layerLoggingKey:  layerLoggingValue,
+		}).Error("handleNewSubjectCallback - b.service.NewCommandSubjectState error: ", err.Error())
 
 		switch err {
 		case errs.ErrUnknownAnswer:
+			metrics.IncrementBusinessErrorTotal()
 			return b.setState(ctx, stateNewSubjectCallback, b.handleNewSubjectCallback)
+		default:
+			metrics.IncrementErrorTotal()
+			return b.setState(ctx, stateDefault, b.handleDefault)
 		}
-
-		return b.setState(ctx, stateDefault, b.handleDefault)
 	}
 
 	return b.setState(ctx, stateNewConfirmationCallback, b.handleNewConfirmationCallback)
 }
 
 func (b *bot) handleNewConfirmationCallback(update *echotron.Update) StateFn {
+	metrics.IncrementCallbackQueryTotal()
+
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
@@ -148,15 +126,20 @@ func (b *bot) handleNewConfirmationCallback(update *echotron.Update) StateFn {
 			ChatID: b.chatID,
 		},
 	}); err != nil {
-		b.log.WithField(chatIDLoggingKey, b.chatID).
-			Error("bot: handleNewConfirmationCallback - b.service.NewCommandConfirmationState error: ", err.Error())
+		b.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: b.chatID,
+			domainLoggingKey: domainLoggingValue,
+			layerLoggingKey:  layerLoggingValue,
+		}).Error("handleNewConfirmationCallback - b.service.NewCommandConfirmationState error: ", err.Error())
 
 		switch err {
 		case errs.ErrUnknownAnswer:
+			metrics.IncrementBusinessErrorTotal()
 			return b.setState(ctx, stateNewConfirmationCallback, b.handleNewConfirmationCallback)
+		default:
+			metrics.IncrementErrorTotal()
+			return b.setState(ctx, stateDefault, b.handleDefault)
 		}
-
-		return b.setState(ctx, stateDefault, b.handleDefault)
 	}
 
 	return b.setState(ctx, stateDefault, b.handleDefault)

@@ -50,3 +50,9 @@ redis:
 mongodb:
   host: "localhost"
   port: "27017"
+
+victoria_metrics:
+  host: "localhost"
+  port: "8428"
+  push_interval: 2
+  metrics_enabled: false

@@ -3,12 +3,12 @@ package migrate
 import (
 	"errors"
 
-	"github.com/sirupsen/logrus"
 	setupMongo "trade-union-service/internal/setup/mongodb"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/mongodb"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/sirupsen/logrus"
 )
 
 type Migrate struct {
@@ -17,6 +17,9 @@ type Migrate struct {
 }
 
 const (
+	setupLoggingKey   = "setup"
+	setupLoggingValue = "mongodb migrate"
+
 	sourceURL    = "file://db/mongodb/migrations"
 	databaseName = "mongodb"
 )
@@ -27,13 +30,15 @@ func NewMigrate(setupMongo *setupMongo.MongoDB, log *logrus.Logger) (*Migrate, e
 		TransactionMode: false,
 	})
 	if err != nil {
-		log.Error("mongodb migrate: NewMigrate - mongodb.WithInstance error: ", err.Error())
+		log.WithField(setupLoggingKey, setupLoggingValue).
+			Error("NewMigrate - mongodb.WithInstance error: ", err.Error())
 		return nil, err
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(sourceURL, databaseName, driver)
 	if err != nil {
-		log.Error("mongodb migrate: NewMigrate - migrate.NewWithDatabaseInstance error: ", err.Error())
+		log.WithField(setupLoggingKey, setupLoggingValue).
+			Error("NewMigrate - migrate.NewWithDatabaseInstance error: ", err.Error())
 		return nil, err
 	}
 
@@ -46,12 +51,17 @@ func NewMigrate(setupMongo *setupMongo.MongoDB, log *logrus.Logger) (*Migrate, e
 func (m *Migrate) Run() error {
 	if err := m.m.Up(); err != nil {
 		if errors.Is(err, migrate.ErrNoChange) {
-			m.log.Debug("mongodb migrate: Run - no change")
+			m.log.WithField(setupLoggingKey, setupLoggingValue).
+				Info("Run - no change")
+
 			return nil
 		}
 
-		m.log.Fatal("mongodb migrate: Run - m.m.Up error: ", err.Error())
+		m.log.WithField(setupLoggingKey, setupLoggingValue).
+			Fatal("Run - m.m.Up error: ", err.Error())
+
 		return err
 	}
+
 	return nil
 }

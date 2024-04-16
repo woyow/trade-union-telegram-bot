@@ -7,6 +7,7 @@ import (
 	"time"
 	"trade-union-service/internal/domains/telegram/domain/entity"
 	"trade-union-service/internal/domains/telegram/errs"
+	"trade-union-service/internal/domains/telegram/metrics"
 )
 
 type bot struct {
@@ -20,9 +21,11 @@ type bot struct {
 func newBot(service service, log *logrus.Logger) func(chatID int64) echotron.Bot {
 	return func(chatID int64) echotron.Bot {
 		bot := &bot{
-			service: service,
-			chatID:  chatID,
-			log:     log,
+			log:      log,
+			handlers: nil,
+			service:  service,
+			chatID:   chatID,
+			state:    nil,
 		}
 
 		bot.handlers = getBotHandlers(bot)
@@ -37,27 +40,57 @@ func newBot(service service, log *logrus.Logger) func(chatID int64) echotron.Bot
 			switch err {
 			case errs.ErrChatCurrentStateNotExists:
 				if err := bot.service.CreateChatCurrentState(ctx, entity.CreateChatCurrentStateServiceDTO{
-					State:  stateDefault,
+					State:  string(stateDefault),
 					ChatID: bot.chatID,
 				}); err != nil {
-					bot.log.WithField(chatIDLoggingKey, bot.chatID).
-						Error("bot: newBot - bot.service.CreateChatCurrentState error: ", err.Error())
+					switch err {
+					case errs.ErrChatCurrentStateAlreadyExists:
+						bot.log.WithFields(logrus.Fields{
+							chatIDLoggingKey: bot.chatID,
+							domainLoggingKey: domainLoggingValue,
+							layerLoggingKey:  layerLoggingValue,
+						}).Error("newBot - bot.service.CreateChatCurrentState error: ", err.Error())
+					default:
+						metrics.IncrementErrorTotal()
+
+						bot.log.WithFields(logrus.Fields{
+							chatIDLoggingKey: bot.chatID,
+							domainLoggingKey: domainLoggingValue,
+							layerLoggingKey:  layerLoggingValue,
+						}).Error("newBot - bot.service.CreateChatCurrentState error: ", err.Error())
+					}
 				}
+			default:
+				metrics.IncrementErrorTotal()
+
+				bot.log.WithFields(logrus.Fields{
+					chatIDLoggingKey: bot.chatID,
+					domainLoggingKey: domainLoggingValue,
+					layerLoggingKey:  layerLoggingValue,
+				}).Error("newBot - bot.service.CreateChatCurrentState error: ", err.Error())
 			}
 
 			bot.state = bot.handleDefault
 		} else {
 			m := bot.getChatStates()
 
-			state, ok := m[chatCurrentState.State]
+			state, ok := m[StateKey(chatCurrentState.State)]
 			if ok {
 				bot.state = state
-				bot.log.WithField(chatIDLoggingKey, bot.chatID).
-					Info("bot: newBot - Set " + chatCurrentState.State + " handler")
+
+				bot.log.WithFields(logrus.Fields{
+					chatIDLoggingKey: bot.chatID,
+					domainLoggingKey: domainLoggingValue,
+					layerLoggingKey:  layerLoggingValue,
+				}).Info("newBot - Set " + chatCurrentState.State + " handler")
 			} else {
 				bot.state = bot.handleDefault
-				bot.log.WithField(chatIDLoggingKey, bot.chatID).
-					Info("bot: newBot - Set default handler")
+
+				bot.log.WithFields(logrus.Fields{
+					chatIDLoggingKey: bot.chatID,
+					domainLoggingKey: domainLoggingValue,
+					layerLoggingKey:  layerLoggingValue,
+				}).Info("newBot - Set default handler")
 			}
 		}
 

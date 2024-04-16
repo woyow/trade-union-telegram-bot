@@ -2,7 +2,10 @@ package service
 
 import (
 	"context"
+
 	"trade-union-service/internal/domains/telegram/domain/entity"
+
+	"github.com/sirupsen/logrus"
 )
 
 func (s *Service) CreateChatCurrentState(ctx context.Context, dto entity.CreateChatCurrentStateServiceDTO) error {
@@ -11,13 +14,20 @@ func (s *Service) CreateChatCurrentState(ctx context.Context, dto entity.CreateC
 		ChatID: dto.ChatID,
 	})
 	if err != nil {
-		s.log.WithField(chatIDLoggingKey, dto.ChatID).
-			Error("service: CreateChatCurrentState - s.repo.CreateChatCurrentState error: ", err.Error())
+		s.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: dto.ChatID,
+			domainLoggingKey: domainLoggingValue,
+			layerLoggingKey:  layerLoggingValue,
+		}).Error("CreateChatCurrentState - s.repo.CreateChatCurrentState error: ", err.Error())
+
 		return nil
 	}
 
-	s.log.WithField(chatIDLoggingKey, dto.ChatID).
-		Info("service: CreateChatCurrentState - create chat state with id: ", out.ID)
+	s.log.WithFields(logrus.Fields{
+		chatIDLoggingKey: dto.ChatID,
+		domainLoggingKey: domainLoggingValue,
+	}).Info("CreateChatCurrentState - create chat state with id: ", out.ID)
+
 	return nil
 }
 
@@ -26,8 +36,12 @@ func (s *Service) SetChatCurrentState(ctx context.Context, dto entity.SetChatCur
 		State:  dto.State,
 		ChatID: dto.ChatID,
 	}); err != nil {
-		s.log.WithField(chatIDLoggingKey, dto.ChatID).
-			Error("service: SetChatCurrentState - s.repo.SetChatCurrentState error: ", err.Error())
+		s.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: dto.ChatID,
+			domainLoggingKey: domainLoggingValue,
+			layerLoggingKey:  layerLoggingValue,
+		}).Error("SetChatCurrentState - s.repo.SetChatCurrentState error: ", err.Error())
+
 		return nil
 	}
 
@@ -39,8 +53,12 @@ func (s *Service) GetChatCurrentState(ctx context.Context, dto entity.GetChatCur
 		ChatID: dto.ChatID,
 	})
 	if err != nil {
-		s.log.WithField(chatIDLoggingKey, dto.ChatID).
-			Error("service: GetChatCurrentState - s.repo.GetChatCurrentState error: ", err.Error())
+		s.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: dto.ChatID,
+			domainLoggingKey: domainLoggingValue,
+			layerLoggingKey:  layerLoggingValue,
+		}).Error("GetChatCurrentState - s.repo.GetChatCurrentState error: ", err.Error())
+
 		return nil, err
 	}
 

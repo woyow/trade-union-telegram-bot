@@ -4,25 +4,25 @@ import (
 	"context"
 	"github.com/NicoNex/echotron/v3"
 	"trade-union-service/internal/domains/telegram/domain/entity"
+	"trade-union-service/internal/domains/telegram/metrics"
 )
 
-type chatStatesMap map[string]StateFn
+type StateKey string
+type chatStatesMap map[StateKey]StateFn
 
 const (
 	// Default.
-	stateEmpty   = ""
-	stateDefault = "default"
+	stateEmpty   = StateKey("")
+	stateDefault = StateKey("default")
 
 	// Start command.
-	stateStartCommand = "/start"
+	stateStartCommand = StateKey("/start")
 
 	// New command.
-	stateNewCommand              = "/new"
-	stateNewFirstName            = "/new_first_name"
-	stateNewLastName             = "/new_last_name"
-	stateNewMiddleName           = "/new_middle_name"
-	stateNewSubjectCallback      = "/new_subject_callback"
-	stateNewConfirmationCallback = "/new_confirmation_callback"
+	stateNewCommand              = StateKey("/new")
+	stateNewFullName             = StateKey("/new_full_name")
+	stateNewSubjectCallback      = StateKey("/new_subject_callback")
+	stateNewConfirmationCallback = StateKey("/new_confirmation_callback")
 )
 
 func (b *bot) getChatStates() chatStatesMap {
@@ -36,9 +36,7 @@ func (b *bot) getChatStates() chatStatesMap {
 
 		// New command
 		stateNewCommand:              b.handleNewCommand,
-		stateNewFirstName:            b.handleNewFirstName,
-		stateNewLastName:             b.handleNewLastName,
-		stateNewMiddleName:           b.handleNewMiddleName,
+		stateNewFullName:             b.handleNewFullName,
 		stateNewSubjectCallback:      b.handleNewSubjectCallback,
 		stateNewConfirmationCallback: b.handleNewConfirmationCallback,
 	}
@@ -46,25 +44,33 @@ func (b *bot) getChatStates() chatStatesMap {
 	return chatStates
 }
 
-func (b *bot) setStateAndCall(ctx context.Context, state string, stateFn StateFn, update *echotron.Update) StateFn {
+func (b *bot) setStateAndCall(ctx context.Context, state StateKey, stateFn StateFn, update *echotron.Update) StateFn {
+	metrics.IncrementSetStateAndCallTotal()
+
 	if err := b.service.SetChatCurrentState(ctx, entity.SetChatCurrentStateServiceDTO{
-		State:  state,
+		State:  string(state),
 		ChatID: b.chatID,
 	}); err != nil {
 		b.log.WithField(chatIDLoggingKey, b.chatID).
 			Error("bot: setState - b.service.SetChatCurrentState error: ", err.Error())
+
+		metrics.IncrementSetStateAndCallErrorTotal()
 	}
 
 	return stateFn(update)
 }
 
-func (b *bot) setState(ctx context.Context, state string, stateFn StateFn) StateFn {
+func (b *bot) setState(ctx context.Context, state StateKey, stateFn StateFn) StateFn {
+	metrics.IncrementSetStateTotal()
+
 	if err := b.service.SetChatCurrentState(ctx, entity.SetChatCurrentStateServiceDTO{
-		State:  state,
+		State:  string(state),
 		ChatID: b.chatID,
 	}); err != nil {
 		b.log.WithField(chatIDLoggingKey, b.chatID).
 			Error("bot: setState - b.service.SetChatCurrentState error: ", err.Error())
+
+		metrics.IncrementSetStateErrorTotal()
 	}
 
 	return stateFn

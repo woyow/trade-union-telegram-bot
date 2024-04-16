@@ -15,6 +15,9 @@ type Redis struct {
 func NewRedis(cfg *Config, log *logrus.Logger) *Redis {
 	client := getRedisClient(cfg)
 
+	log.WithField(setupLoggingKey, setupLoggingValue).
+		Info("NewRedis - redis client has been initialized")
+
 	return &Redis{
 		client: client,
 		log:    log,
@@ -22,7 +25,9 @@ func NewRedis(cfg *Config, log *logrus.Logger) *Redis {
 }
 
 const (
-	addressSeparator = ":"
+	setupLoggingKey   = "setup"
+	setupLoggingValue = "redis"
+	addressSeparator  = ":"
 )
 
 // getRedisClient - Returns *redis.Client.

@@ -14,6 +14,9 @@ import (
 )
 
 const (
+	setupLoggingKey   = "setup"
+	setupLoggingValue = "fiber"
+
 	addressSeparator = ":"
 )
 
@@ -46,7 +49,8 @@ func (f *Fiber) Run(ctx context.Context) error {
 		EnablePrefork:         false,
 		EnablePrintRoutes:     true,
 	}); err != nil {
-		f.log.Error("fiber: Run - f.app.Listen error: ", err.Error())
+		f.log.WithField(setupLoggingKey, setupLoggingValue).
+			Error("Run - f.app.Listen error: ", err.Error())
 
 		return err
 	}

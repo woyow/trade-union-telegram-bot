@@ -3,16 +3,12 @@ package mongodb
 import (
 	"context"
 	"errors"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"trade-union-service/internal/domains/telegram/domain/entity"
 	"trade-union-service/internal/domains/users/errs"
-)
-
-const (
-	appealsCollection        = "appeals"
-	appealSubjectsCollection = "appealSubjects"
 )
 
 func (r *RepoImpl) DeleteDraftAppeal(ctx context.Context, dto entity.DeleteDraftAppealRepoDTO) error {
@@ -22,8 +18,12 @@ func (r *RepoImpl) DeleteDraftAppeal(ctx context.Context, dto entity.DeleteDraft
 		Collection(appealsCollection).
 		DeleteOne(ctx, filter)
 	if err != nil {
-		r.log.WithField(chatIDLoggingKey, dto.ChatID).
-			Error("mongo: DeleteDraftAppeal query error: ", err.Error())
+		r.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: dto.ChatID,
+			domainLoggingKey: domainLoggingValue,
+			infraLoggingKey:  indraLoggingValue,
+		}).Error("DeleteDraftAppeal query error: ", err.Error())
+
 		return err
 	}
 
@@ -40,8 +40,12 @@ func (r *RepoImpl) CreateAppeal(ctx context.Context, dto entity.CreateAppealRepo
 		Collection(appealsCollection).
 		InsertOne(ctx, doc)
 	if err != nil {
-		r.log.WithField(chatIDLoggingKey, dto.ChatID).
-			Error("mongo: CreateAppeal query error: ", err.Error())
+		r.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: dto.ChatID,
+			domainLoggingKey: domainLoggingValue,
+			infraLoggingKey:  indraLoggingValue,
+		}).Error("CreateAppeal query error: ", err.Error())
+
 		return nil, err
 	}
 
@@ -96,8 +100,12 @@ func (r *RepoImpl) UpdateDraftAppeal(ctx context.Context, dto entity.UpdateAppea
 		Collection(appealsCollection).
 		UpdateOne(ctx, filter, update)
 	if err != nil {
-		r.log.WithField(chatIDLoggingKey, dto.ChatID).
-			Error("mongo: UpdateDraftAppeal query error: ", err.Error())
+		r.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: dto.ChatID,
+			domainLoggingKey: domainLoggingValue,
+			infraLoggingKey:  indraLoggingValue,
+		}).Error("UpdateDraftAppeal query error: ", err.Error())
+
 		return err
 	}
 
@@ -118,8 +126,12 @@ func (r *RepoImpl) GetDraftAppeal(ctx context.Context, dto entity.GetDraftAppeal
 			return nil, errs.ErrUserNotFound
 		}
 
-		r.log.WithField(chatIDLoggingKey, dto.ChatID).
-			Error("repo: GetDraftAppeal - res.Decode error: ", err.Error())
+		r.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: dto.ChatID,
+			domainLoggingKey: domainLoggingValue,
+			infraLoggingKey:  indraLoggingValue,
+		}).Error("GetDraftAppeal - res.Decode error: ", err.Error())
+
 		return nil, err
 	}
 
@@ -140,8 +152,11 @@ func (r *RepoImpl) GetAppealSubjects(ctx context.Context, dto entity.GetAppealSu
 		Collection(appealSubjectsCollection).
 		Find(ctx, filter)
 	if err != nil {
-		r.log.WithField(chatIDLoggingKey, dto.ChatID).
-			Error("repo: GetAppealSubjects query error: ", err.Error())
+		r.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: dto.ChatID,
+			domainLoggingKey: domainLoggingValue,
+			infraLoggingKey:  indraLoggingValue,
+		}).Error("GetAppealSubjects query error: ", err.Error())
 
 		return nil, err
 	}
@@ -153,8 +168,11 @@ func (r *RepoImpl) GetAppealSubjects(ctx context.Context, dto entity.GetAppealSu
 			return nil, err
 		}
 
-		r.log.WithField(chatIDLoggingKey, dto.ChatID).
-			Error("repo: GetAppealSubjects - res.Decode error: ", err.Error())
+		r.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: dto.ChatID,
+			domainLoggingKey: domainLoggingValue,
+			infraLoggingKey:  indraLoggingValue,
+		}).Error("GetAppealSubjects - res.Decode error: ", err.Error())
 
 		return nil, err
 	}

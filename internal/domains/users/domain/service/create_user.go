@@ -17,8 +17,9 @@ func (s *Service) CreateUser(ctx context.Context, dto entity.CreateUserServiceDT
 	})
 	if err != nil {
 		s.log.Error("service: CreateUser - s.repo.CreateUser error: ", err.Error())
+
 		return nil, err
 	}
+
 	return out, nil
 }
-

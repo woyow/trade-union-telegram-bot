@@ -8,7 +8,12 @@ import (
 )
 
 const (
-	chatIDLoggingKey = "chatID"
+	domainLoggingKey   = "domain"
+	domainLoggingValue = "telegram"
+	layerLoggingKey    = "layer"
+	layerLoggingValue  = "telegram delivery"
+
+	chatIDLoggingKey = "chat_id"
 )
 
 type service interface {
@@ -25,9 +30,7 @@ type service interface {
 
 	// New command service
 	NewCommand(ctx context.Context, dto entity.NewCommandServiceDTO) error
-	NewCommandFirstNameState(ctx context.Context, dto entity.NewCommandFirstNameStateServiceDTO) error
-	NewCommandLastNameState(ctx context.Context, dto entity.NewCommandLastNameStateServiceDTO) error
-	NewCommandMiddleNameState(ctx context.Context, dto entity.NewCommandMiddleNameStateServiceDTO) error
+	NewCommandFullNameState(ctx context.Context, dto entity.NewCommandFullNameStateServiceDTO) error
 	NewCommandSubjectState(ctx context.Context, dto entity.NewCommandSubjectStateServiceDTO) error
 	NewCommandConfirmationState(ctx context.Context, dto entity.NewCommandConfirmationStateServiceDTO) error
 }
@@ -46,7 +49,15 @@ func NewTelegram(service service, token string, log *logrus.Logger) *Telegram {
 }
 
 func (b *Telegram) Run() error {
-	defer b.log.Error("bot: Run - stop telegram bot")
-	b.log.Info("bot: Run - start telegram bot")
+	defer b.log.WithFields(logrus.Fields{
+		domainLoggingKey: domainLoggingValue,
+		layerLoggingKey:  layerLoggingValue,
+	}).Error("Run - stop telegram bot")
+
+	b.log.WithFields(logrus.Fields{
+		domainLoggingKey: domainLoggingValue,
+		layerLoggingKey:  layerLoggingValue,
+	}).Info("Run - start telegram bot")
+
 	return b.dispatcher.Poll()
 }

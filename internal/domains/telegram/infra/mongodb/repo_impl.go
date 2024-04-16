@@ -6,11 +6,20 @@ import (
 )
 
 const (
-	chatIDLoggingKey = "chatID"
+	// Logging.
+	chatIDLoggingKey   = "chat_id"
+	domainLoggingKey   = "domain"
+	domainLoggingValue = "telegram"
+	infraLoggingKey    = "infra"
+	indraLoggingValue  = "mongodb"
 
+	// Database.
 	tradeUnionDatabase = "tradeUnion"
 
-	chatStatesCollection = "chatStates"
+	// Collections.
+	appealsCollection        = "appeals"
+	appealSubjectsCollection = "appealSubjects"
+	chatStatesCollection     = "chatStates"
 )
 
 type RepoImpl struct {

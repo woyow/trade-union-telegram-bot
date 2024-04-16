@@ -22,49 +22,70 @@ func (r *RepoImpl) UpdateUser(ctx context.Context, dto entity.UpdateUserRepoDTO)
 		return err
 	}
 
-	filter := bson.D{{"_id", objectID}}
+	filter := bson.D{{
+		Key:   "_id",
+		Value: objectID,
+	}}
 
 	update := make(bson.D, 0, defaultCapacity)
 
 	if dto.Fname != nil {
 		update = append(update, bson.E{
-			Key:   "$set",
-			Value: bson.D{{"fname", *dto.Fname}},
+			Key: "$set",
+			Value: bson.D{{
+				Key:   "fname",
+				Value: *dto.Fname,
+			}},
 		})
 	}
 
 	if dto.Lname != nil {
 		update = append(update, bson.E{
-			Key:   "$set",
-			Value: bson.D{{"lname", *dto.Lname}},
+			Key: "$set",
+			Value: bson.D{{
+				Key:   "lname",
+				Value: *dto.Lname,
+			}},
 		})
 	}
 
 	if dto.Mname != nil {
 		update = append(update, bson.E{
-			Key:   "$set",
-			Value: bson.D{{"mname", *dto.Mname}},
+			Key: "$set",
+			Value: bson.D{{
+				Key:   "mname",
+				Value: *dto.Mname,
+			}},
 		})
 	}
 
 	if dto.Position != nil {
 		update = append(update, bson.E{
-			Key:   "$set",
-			Value: bson.D{{"position", *dto.Position}},
+			Key: "$set",
+			Value: bson.D{{
+				Key:   "position",
+				Value: *dto.Position,
+			}},
 		})
 	}
 
 	if dto.ChatID != nil {
 		update = append(update, bson.E{
-			Key:   "$set",
-			Value: bson.D{{"chatId", *dto.ChatID}},
+			Key: "$set",
+			Value: bson.D{{
+				Key:   "chatId",
+				Value: *dto.ChatID,
+			}},
 		})
 	}
 
 	if dto.Roles != nil {
 		update = append(update, bson.E{
-			Key:   "$set",
-			Value: bson.D{{"chatId", dto.Roles}},
+			Key: "$set",
+			Value: bson.D{{
+				Key:   "chatId",
+				Value: dto.Roles,
+			}},
 		})
 	}
 

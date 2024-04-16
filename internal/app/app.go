@@ -28,6 +28,7 @@ type setup struct {
 	redis    *setupRedis.Redis
 	mongodb  *setupMongoDB.MongoDB
 	echotron *setupEchotron.Echotron
+	metrics  *setupVictoriaMetrics.VictoriaMetrics
 }
 
 type migrate struct {
@@ -79,6 +80,8 @@ func NewApp() *app {
 		panic(err)
 	}
 
+	metrics := setupVictoriaMetrics.NewVictoriaMetrics(&cfg.VictoriaMetrics, logger)
+
 	return &app{
 		log:      logger,
 		cfg:      cfg,
@@ -91,6 +94,7 @@ func NewApp() *app {
 			mongodb:  mongodb,
 			redis:    redis,
 			echotron: echotron,
+			metrics:  metrics,
 		},
 		migrate: migrate{
 			mongodb: mongodbMigrate,
@@ -108,13 +112,8 @@ func (a *app) Run() error {
 
 	// Initialize domains
 	{
-		telegram.NewDomain(a.setup.mongodb, a.setup.echotron, a.log)
+		telegram.NewDomain(a.setup.mongodb, a.setup.echotron, a.setup.metrics, a.log)
 		users.NewDomain(a.setup.mongodb, a.setup.fiber, a.log)
-	}
-
-	// Ititialize metrics
-	{
-		setupVictoriaMetrics.NewVictoriaMetrics(a.log)
 	}
 
 	// Handle stop program
@@ -128,6 +127,13 @@ func (a *app) Run() error {
 
 	a.errGroup.Go(func() error {
 		if err := a.setup.fiber.Run(a.ctx); err != nil {
+			return err
+		}
+		return nil
+	})
+
+	a.errGroup.Go(func() error {
+		if err := a.setup.metrics.Run(); err != nil {
 			return err
 		}
 		return nil
