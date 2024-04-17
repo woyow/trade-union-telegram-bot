@@ -35,7 +35,23 @@ nano ./configs/prod.yaml
 ```
 
 ### 4. Run
+Initialize environment:
+```bash
+source .env
+```
 Run with docker-compose:
 ```bash
 docker-compose up --build -d
 ```
+
+### 5. Run with metrics
+Edit your config:
+```yaml
+victoria_metrics:
+  metrics_enabled: true
+```
+Run victoria metrics + grafana
+```bash
+docker-compose --file ./metrics/victoria-metrics/docker-compose.yml up --build -d
+```
+Open Grafana on http://localhost:3000/ and sign in with default credentials admin:admin and change password

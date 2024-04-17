@@ -55,4 +55,4 @@ victoria_metrics:
   host: "localhost"
   port: "8428"
   push_interval: 2
-  metrics_enabled: false
+  metrics_enabled: true

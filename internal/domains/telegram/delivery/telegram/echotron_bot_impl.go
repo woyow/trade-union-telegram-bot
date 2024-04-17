@@ -18,7 +18,7 @@ type bot struct {
 	state    StateFn
 }
 
-func newBot(service service, log *logrus.Logger) func(chatID int64) echotron.Bot {
+func newBot(destructCh chan destructChatID, service service, log *logrus.Logger) func(chatID int64) echotron.Bot {
 	return func(chatID int64) echotron.Bot {
 		bot := &bot{
 			log:      log,
@@ -93,6 +93,18 @@ func newBot(service service, log *logrus.Logger) func(chatID int64) echotron.Bot
 				}).Info("newBot - Set default handler")
 			}
 		}
+
+		go func() {
+			<-time.After(10 * time.Minute)
+
+			bot.log.WithFields(logrus.Fields{
+				chatIDLoggingKey: bot.chatID,
+				domainLoggingKey: domainLoggingValue,
+				layerLoggingKey:  layerLoggingValue,
+			}).Info("newBot - send destruct bot")
+
+			destructCh <- destructChatID(bot.chatID)
+		}()
 
 		return bot
 	}

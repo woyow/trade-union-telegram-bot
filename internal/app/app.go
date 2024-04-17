@@ -113,7 +113,7 @@ func (a *app) Run() error {
 	// Initialize domains
 	{
 		telegram.NewDomain(a.setup.mongodb, a.setup.echotron, a.setup.metrics, a.log)
-		users.NewDomain(a.setup.mongodb, a.setup.fiber, a.log)
+		users.NewDomain(a.setup.mongodb, a.setup.fiber, a.setup.metrics, a.log)
 	}
 
 	// Handle stop program

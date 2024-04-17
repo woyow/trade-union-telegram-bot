@@ -40,11 +40,36 @@ type Telegram struct {
 	log        *logrus.Logger
 }
 
+type destructChatID int64
+
 func NewTelegram(service service, token string, log *logrus.Logger) *Telegram {
-	dispatcher := echotron.NewDispatcher(token, newBot(service, log))
+	destructCh := make(chan destructChatID)
+	dispatcher := echotron.NewDispatcher(token, newBot(destructCh, service, log))
+
+	go destructBot(destructCh, dispatcher, log)
+
 	return &Telegram{
 		dispatcher: dispatcher,
 		log:        log,
+	}
+}
+
+func destructBot(destructCh <-chan destructChatID, dispatcher *echotron.Dispatcher, log *logrus.Logger) {
+	for {
+		select {
+		case b := <-destructCh:
+			log.WithFields(logrus.Fields{
+				domainLoggingKey: domainLoggingValue,
+				layerLoggingKey:  layerLoggingValue,
+			}).Info("destructBot - handle destruct for chatID: ", int64(b))
+
+			dispatcher.DelSession(int64(b))
+
+			log.WithFields(logrus.Fields{
+				domainLoggingKey: domainLoggingValue,
+				layerLoggingKey:  layerLoggingValue,
+			}).Info("destructBot - destruct bot with chatID: ", int64(b))
+		}
 	}
 }
 
