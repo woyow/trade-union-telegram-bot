@@ -22,7 +22,7 @@ func NewDomain(setupMongo *setupMongo.MongoDB, setupEchotron *setupEchotron.Echo
 	metrics.ConfigureMetrics(setupVictoriaMetrics.Config)
 
 	repo := mongodb.NewRepoImpl(setupMongo.Client, log)
-	api := tgapi.NewApiImpl(setupEchotron.API, log)
+	api := tgapi.NewAPIImpl(setupEchotron.API, log)
 	svc := service.NewService(repo, api, log)
 	bot := telegram.NewTelegram(svc, setupEchotron.Token, log)
 

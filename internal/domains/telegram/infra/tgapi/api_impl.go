@@ -19,7 +19,7 @@ type APIImpl struct {
 	log *logrus.Logger
 }
 
-func NewApiImpl(api *echotron.API, log *logrus.Logger) *APIImpl {
+func NewAPIImpl(api *echotron.API, log *logrus.Logger) *APIImpl {
 	return &APIImpl{
 		api: api,
 		log: log,

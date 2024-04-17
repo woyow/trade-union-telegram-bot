@@ -50,7 +50,7 @@ func NewConfig() (*Config, error) {
 	return &cfg, nil
 }
 
-// readEnv - Read environment file (.env) and unmarshal data to config
+// readEnv - Read environment file (.env) and unmarshal data to config.
 func (cfg *Config) readEnv() error {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("config: readEnv - godotenv.Load error: ", err.Error())
@@ -65,7 +65,7 @@ func (cfg *Config) readEnv() error {
 	return nil
 }
 
-// readConfigFile - Read yaml config file and unmarshal data to config
+// readConfigFile - Read yaml config file and unmarshal data to config.
 func (cfg *Config) readConfigFile() error {
 	fileName := configDir + "/" + cfg.App.Env + ".yaml"
 

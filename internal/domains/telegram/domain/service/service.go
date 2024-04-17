@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
-	"github.com/sirupsen/logrus"
+
 	"trade-union-service/internal/domains/telegram/domain/entity"
+
+	"github.com/sirupsen/logrus"
 )
 
 const (

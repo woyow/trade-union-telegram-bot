@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 
-	"github.com/sirupsen/logrus"
-
 	"trade-union-service/internal/domains/users/domain/entity"
+
+	"github.com/sirupsen/logrus"
 )
 
 type repo interface {
