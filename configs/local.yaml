@@ -6,6 +6,11 @@ logger:
   log_level: "debug"
   disable_timestamp: false
   full_timestamp: true
+  elastic:
+    enable: true
+    cert: "./logs/elk/certs/ca/ca.crt"
+    url: "https://localhost:9200"
+    index_name: trade_union
 
 fiber:
   app_name: "Fiber-Server"
@@ -55,4 +60,4 @@ victoria_metrics:
   host: "localhost"
   port: "8428"
   push_interval: 2
-  metrics_enabled: true
+  metrics_enabled: false

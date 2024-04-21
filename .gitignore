@@ -26,6 +26,9 @@ go.work
 # Env
 .env
 
+# Certs
+logs/elk/certs
+
 # IDE
 .idea
 

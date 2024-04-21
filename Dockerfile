@@ -9,12 +9,9 @@ WORKDIR /app
 COPY go.* /app/
 COPY cmd /app/cmd
 COPY internal/ /app/internal
-#COPY configs/ /app/configs
 #COPY docs /app/docs
 
-
 COPY Makefile /app/Makefile
-#RUN go install github.com/swaggo/swag/cmd/swag@latest
 
 RUN make build
 
