@@ -21,6 +21,10 @@ ADMIN_API_TOKEN: example-token
 MONGO_USERNAME: admin
 MONGO_PASSWORD: <your_mongo_admin_password>
 MONGO_DATABASE: tradeUnion
+
+# Elastic
+ELASTIC_USERNAME=elastic
+ELASTIC_PASSWORD=<your_elastic_password>
 ```
 
 ### 2. Create config
