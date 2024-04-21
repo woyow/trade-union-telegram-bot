@@ -84,3 +84,5 @@ Run elasticsearch + kibana
 ```bash
 docker-compose --file ./logs/elk/docker-compose.yml up --build -d
 ```
+
+Open kibana on http://localhost:5601/ and sign in with your credentials from environment
