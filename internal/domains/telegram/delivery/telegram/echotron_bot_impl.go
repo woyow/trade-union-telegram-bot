@@ -11,24 +11,27 @@ import (
 )
 
 type bot struct {
-	log      *logrus.Logger
-	handlers []Handler
-	service  service
-	chatID   int64
-	state    StateFn
+	log              *logrus.Logger
+	messageHandlers  []MessageHandler
+	callbackHandlers []CallbackHandler
+	service          service
+	chatID           int64
+	state            StateFn
 }
 
 func newBot(destructCh chan destructChatID, service service, log *logrus.Logger) func(chatID int64) echotron.Bot {
 	return func(chatID int64) echotron.Bot {
 		bot := &bot{
-			log:      log,
-			handlers: nil,
-			service:  service,
-			chatID:   chatID,
-			state:    nil,
+			log:              log,
+			messageHandlers:  nil,
+			callbackHandlers: nil,
+			service:          service,
+			chatID:           chatID,
+			state:            nil,
 		}
 
-		bot.handlers = getBotHandlers(bot)
+		bot.messageHandlers = getBotMessageHandlers(bot)
+		bot.callbackHandlers = getBotCallbackHandlers(bot)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		defer cancel()

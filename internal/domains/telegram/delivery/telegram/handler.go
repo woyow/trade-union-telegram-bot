@@ -11,8 +11,13 @@ import (
 
 type StateFn func(*echotron.Update) StateFn
 
-type Handler struct {
-	msgText  string
+type MessageHandler struct {
+	text     string
+	handleFn StateFn
+}
+
+type CallbackHandler struct {
+	data     string
 	handleFn StateFn
 }
 
@@ -21,17 +26,21 @@ const (
 	newCommand   = "/new"
 )
 
-func getBotHandlers(bot *bot) []Handler {
-	return []Handler{
+func getBotMessageHandlers(bot *bot) []MessageHandler {
+	return []MessageHandler{
 		{
-			msgText:  startCommand,
+			text:     startCommand,
 			handleFn: bot.handleStartCommand,
 		},
 		{
-			msgText:  newCommand,
+			text:     newCommand,
 			handleFn: bot.handleNewCommand,
 		},
 	}
+}
+
+func getBotCallbackHandlers(bot *bot) []CallbackHandler {
+	return []CallbackHandler{}
 }
 
 func (b *bot) handleDefault(update *echotron.Update) StateFn {
@@ -63,7 +72,7 @@ func (b *bot) handleMessage(update *echotron.Update) StateFn {
 		chatIDLoggingKey: b.chatID,
 		domainLoggingKey: domainLoggingValue,
 		layerLoggingKey:  layerLoggingValue,
-	}).Debug("handleMessage - Message Text: ", update.Message.Text)
+	}).Debug("handleMessage - Message text: ", update.Message.Text)
 
 	b.log.WithFields(logrus.Fields{
 		chatIDLoggingKey: b.chatID,
@@ -71,11 +80,11 @@ func (b *bot) handleMessage(update *echotron.Update) StateFn {
 		layerLoggingKey:  layerLoggingValue,
 	}).Debug("handleMessage - Message LanguageCode: ", update.Message.From.LanguageCode)
 
-	for i := range b.handlers {
-		if update.Message.Text == b.handlers[i].msgText {
+	for i := range b.messageHandlers {
+		if update.Message.Text == b.messageHandlers[i].text {
 			ctx, _ := context.WithTimeout(context.Background(), 1*time.Second)
 
-			return b.setStateAndCall(ctx, StateKey(b.handlers[i].msgText), b.handlers[i].handleFn, update)
+			return b.setStateAndCall(ctx, StateKey(b.messageHandlers[i].text), b.messageHandlers[i].handleFn, update)
 		}
 	}
 
@@ -105,6 +114,14 @@ func (b *bot) handleCallbackQuery(update *echotron.Update) StateFn {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
+	for i := range b.callbackHandlers {
+		if update.CallbackQuery.Data == b.callbackHandlers[i].data {
+			ctx, _ := context.WithTimeout(context.Background(), 1*time.Second)
+
+			return b.setStateAndCall(ctx, StateKey(b.callbackHandlers[i].data), b.callbackHandlers[i].handleFn, update)
+		}
+	}
+
 	b.log.WithFields(logrus.Fields{
 		chatIDLoggingKey: b.chatID,
 		domainLoggingKey: domainLoggingValue,
@@ -124,7 +141,7 @@ func (b *bot) handleEditedMessage(update *echotron.Update) StateFn {
 		chatIDLoggingKey: b.chatID,
 		domainLoggingKey: domainLoggingValue,
 		layerLoggingKey:  layerLoggingValue,
-	}).Debug("handleEditedMessage - EditedMessage Text: ", update.EditedMessage.Text)
+	}).Debug("handleEditedMessage - EditedMessage text: ", update.EditedMessage.Text)
 
 	return b.setState(ctx, stateDefault, b.handleDefault)
 }

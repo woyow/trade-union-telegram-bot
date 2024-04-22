@@ -1,6 +1,6 @@
 # trade-union-telegram-bot
 
-Telegram bot with state management
+Telegram bot with state management. You can use this as a template for your projects.
 
 # Usage
 ### 1. Create .env file

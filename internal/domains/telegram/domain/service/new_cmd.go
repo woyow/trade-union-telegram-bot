@@ -132,7 +132,7 @@ func (s *Service) getButtons(dto getButtonsDTO) [][]entity.InlineButton {
 		}()
 
 		for j := 0; j < buttonsOnLine; j++ {
-			s.log.Debug("getButtons - dto.buttons[i].Text: ", dto.buttons[i].Text)
+			s.log.Debug("getButtons - dto.buttons[i].text: ", dto.buttons[i].Text)
 
 			buttons = append(buttons, entity.InlineButton{
 				Text:         strconv.Itoa(i + 1),
