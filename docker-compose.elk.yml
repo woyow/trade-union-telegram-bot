@@ -5,7 +5,7 @@ services:
     env_file: .env
     image: elasticsearch:7.17.20
     volumes:
-      - ./certs:/usr/share/elasticsearch/config/certs
+      - ./logs/elk/certs:/usr/share/elasticsearch/config/certs
     user: "0"
     command: >
       bash -c '
@@ -67,7 +67,7 @@ services:
         condition: service_healthy
     image: elasticsearch:7.17.20
     volumes:
-      - ./certs:/usr/share/elasticsearch/config/certs
+      - ./logs/elk/certs:/usr/share/elasticsearch/config/certs
       - esdata01:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
@@ -109,7 +109,7 @@ services:
         condition: service_healthy
     image: kibana:7.17.20
     volumes:
-      - ./certs:/usr/share/kibana/config/certs
+      - ./logs/elk/certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
     ports:
       - "5601:5601"

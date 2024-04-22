@@ -21,10 +21,6 @@ ADMIN_API_TOKEN: example-token
 MONGO_USERNAME: admin
 MONGO_PASSWORD: <your_mongo_admin_password>
 MONGO_DATABASE: tradeUnion
-
-# Elastic
-ELASTIC_USERNAME=elastic
-ELASTIC_PASSWORD=<your_elastic_password>
 ```
 
 ### 2. Create config
@@ -56,7 +52,7 @@ victoria_metrics:
 ```
 Run victoria metrics + grafana
 ```bash
-docker-compose --file ./metrics/victoria-metrics/docker-compose.yml up --build -d
+docker-compose --file ./docker-compose.vm.yml up --build -d
 ```
 Open Grafana on http://localhost:3000/ and sign in with default credentials admin:admin and change password
 
@@ -69,7 +65,7 @@ logger:
 ```
 Set environment variables
 ```bash
-nano ./logs/elk/.env
+nano .env
 ```
 For example
 ```dotenv
@@ -82,7 +78,7 @@ KIBANA_PASSWORD=<your_kibana_system_password>
 
 Run elasticsearch + kibana
 ```bash
-docker-compose --file ./logs/elk/docker-compose.yml up --build -d
+docker-compose --file ./docker-compose.elk.yml up --build -d
 ```
 
 Open kibana on http://localhost:5601/ and sign in with your credentials from environment

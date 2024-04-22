@@ -8,7 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"trade-union-service/internal/domains/telegram/domain/entity"
-	"trade-union-service/internal/domains/users/errs"
 )
 
 func (r *RepoImpl) DeleteDraftAppeal(ctx context.Context, dto entity.DeleteDraftAppealRepoDTO) error {
@@ -99,29 +98,46 @@ func (r *RepoImpl) UpdateDraftAppeal(ctx context.Context, dto entity.UpdateAppea
 }
 
 func (r *RepoImpl) GetDraftAppeal(ctx context.Context, dto entity.GetDraftAppealRepoDTO) (*entity.GetDraftAppealRepoOut, error) {
-	filter := bson.D{{"chatId", dto.ChatID}, {"isDraft", true}}
+	match := bson.D{{"$match", bson.D{{"isDraft", true}, {"chatId", dto.ChatID}}}}
+	sort := bson.D{{"$sort", bson.D{{"_id", -1}}}}
+	lookup := bson.D{{"$lookup", bson.D{{"from", "appealSubjects"}, {"localField", "subject"}, {"foreignField", "callbackData"}, {"as", "subject"}}}}
+	unwind := bson.D{{"$unwind", "$subject"}}
+	project := bson.D{{"$project", bson.D{{"_id", 1}, {"fullName", 1}, {"isDraft", 1}, {"chatId", 1}, {"subject", "$subject.text"}}}}
+	limit := bson.D{{"$limit", 1}}
 
-	res := r.db.Database(tradeUnionDatabase).
+	cur, err := r.db.Database(tradeUnionDatabase).
 		Collection(appealsCollection).
-		FindOne(ctx, filter)
-
-	var out entity.GetDraftAppealRepoOut
-
-	if err := res.Decode(&out); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, errs.ErrUserNotFound
-		}
-
+		Aggregate(ctx, mongo.Pipeline{
+			match,
+			sort,
+			lookup,
+			unwind,
+			project,
+			limit,
+		})
+	if err != nil {
 		r.log.WithFields(logrus.Fields{
 			chatIDLoggingKey: dto.ChatID,
 			domainLoggingKey: domainLoggingValue,
 			infraLoggingKey:  indraLoggingValue,
-		}).Error("GetDraftAppeal - res.Decode error: ", err.Error())
+		}).Error("GetDraftAppeal query error: ", err.Error())
 
 		return nil, err
 	}
 
-	return &out, nil
+	var out []entity.GetDraftAppealRepoOut
+
+	if err := cur.All(ctx, &out); err != nil {
+		r.log.WithFields(logrus.Fields{
+			chatIDLoggingKey: dto.ChatID,
+			domainLoggingKey: domainLoggingValue,
+			infraLoggingKey:  indraLoggingValue,
+		}).Error("GetDraftAppeal - cur.All error: ", err.Error())
+
+		return nil, err
+	}
+
+	return &out[0], nil
 }
 
 func (r *RepoImpl) GetAppealSubjects(ctx context.Context, dto entity.GetAppealSubjectsRepoDTO) (entity.GetAppealSubjectsRepoOut, error) {

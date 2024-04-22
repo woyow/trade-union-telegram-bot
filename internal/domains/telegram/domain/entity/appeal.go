@@ -29,8 +29,8 @@ type GetDraftAppealRepoDTO struct {
 }
 
 type GetDraftAppealRepoOut struct {
-	FullName string `bson:"fullName"`
-	Subject  string `bson:"subject"`
+	FullName string       `bson:"fullName"`
+	Subject  Localization `bson:"subject"`
 }
 
 type GetAppealSubjectsRepoDTO struct {

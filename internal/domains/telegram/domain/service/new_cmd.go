@@ -300,7 +300,7 @@ func (s *Service) sendFinalAppeal(dto sendFinalAppealDTO) error {
 	var text string
 
 	fullName := strings.ReplaceAll(dto.appeal.FullName, "`", "")
-	subject := strings.ReplaceAll(dto.appeal.Subject, "`", "")
+	subject := s.translateLocalization(dto.appeal.Subject, dto.lang)
 
 	text += fmt.Sprintf(
 		"*%s*: `%s`\n"+
