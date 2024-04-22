@@ -1,0 +1,6 @@
+db.appeals.aggregate([
+    { $match:{"isDraft": true, "chatId": 12345678} },
+    { $lookup:{"from": "appealSubjects", "localField": "subject", "foreignField": "callbackData", "as": "subject"} },
+    { $unwind: "$subject" },
+    { $project: {"_id": 1, "fullName": 1, "isDraft": 1, "chatId": 1, "subject": "$subject.text"} }
+])

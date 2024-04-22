@@ -1,0 +1,15 @@
+[
+  {
+    "createIndexes": "appealSubjects",
+    "indexes": [
+      {
+        "key": {
+          "callbackData": 1
+        },
+        "name": "unique_callback_data",
+        "unique": true,
+        "background": true
+      }
+    ]
+  }
+]

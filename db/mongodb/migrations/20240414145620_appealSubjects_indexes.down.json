@@ -1,0 +1,6 @@
+[
+  {
+    "dropIndexes": "appealSubjects",
+    "index": "unique_callback_data"
+  }
+]
