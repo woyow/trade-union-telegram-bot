@@ -1,6 +1,10 @@
 # trade-union-telegram-bot
 
-Telegram bot with state management. You can use this as a template for your projects.
+Telegram bot with state management and localization. Work example - https://imgur.com/0V3fsdD
+
+You can use this as a template for your projects.
+
+Using: Go, Mongodb, Elasticsearch, Kibana, VictoriaMetrics, Grafana, Docker, Docker Compose
 
 # Usage
 ### 1. Create .env file
