@@ -34,14 +34,23 @@ For example use nano editor:
 nano ./configs/prod.yaml
 ```
 
-### 4. Run
+### 4. Run with docker-compose
 Initialize environment:
 ```bash
 source .env
 ```
+
 Run with docker-compose:
 ```bash
 docker-compose up --build -d
+```
+
+Or run for local development and debug
+```bash
+docker-compose --file ./docker-compose.mongo.yml up --build -d
+```
+```bash
+go run ./cmd/trade-union/main.go
 ```
 
 ### 5. Run with metrics

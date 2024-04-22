@@ -1,0 +1,42 @@
+db.appealSubjects.insertMany([
+    {
+        "text":{
+            "en": "Joining a trade union",
+            "ru": "Вступление в профсоюз"
+        },
+        "callbackData": "1",
+        "isActive": true
+    },
+    {
+        "text":{
+            "en": "Application for deregistration from trade union registration",
+            "ru": "Заявление о снятии с профсоюзного учета"
+        },
+        "callbackData": "2",
+        "isActive": true
+    },
+    {
+        "text":{
+            "en": "Application for financial assistance from the trade union committee",
+            "ru": "Заявление об оказании материальной помощи профкома"
+        },
+        "callbackData": "3",
+        "isActive": true
+    },
+    {
+        "text":{
+            "en": "Application for financial assistance from the trade union bureau",
+            "ru": "Заявление об оказании материальной помощи профбюро"
+        },
+        "callbackData": "4",
+        "isActive": true
+    },
+    {
+        "text":{
+            "en": "Application for a tourist (excursion) voucher",
+            "ru": "Заявление о предоставлении туристической (экскурсионной) путевки"
+        },
+        "callbackData": "5",
+        "isActive": true
+    }
+])
