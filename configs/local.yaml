@@ -7,7 +7,7 @@ logger:
   disable_timestamp: false
   full_timestamp: true
   elastic:
-    enable: true
+    enable: false
     cert: "./logs/elk/certs/ca/ca.crt"
     url: "https://localhost:9200"
     index_name: trade_union

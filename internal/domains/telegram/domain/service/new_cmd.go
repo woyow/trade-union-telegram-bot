@@ -154,11 +154,9 @@ func (s *Service) getButtons(dto getButtonsDTO) [][]entity.InlineButton {
 func (s *Service) NewCommandFullNameState(ctx context.Context, dto entity.NewCommandFullNameStateServiceDTO) error {
 	if err := s.repo.UpdateDraftAppeal(ctx, entity.UpdateAppealRepoDTO{
 		UpdateAppealBase: entity.UpdateAppealBase{
-			Fname:   nil,
-			Lname:   nil,
-			Mname:   &dto.Text,
-			Subject: nil,
-			IsDraft: nil,
+			FullName: &dto.Text,
+			Subject:  nil,
+			IsDraft:  nil,
 		},
 		ChatID: dto.ChatID,
 	}); err != nil {
@@ -240,11 +238,9 @@ func (s *Service) NewCommandFullNameState(ctx context.Context, dto entity.NewCom
 func (s *Service) NewCommandSubjectState(ctx context.Context, dto entity.NewCommandSubjectStateServiceDTO) error {
 	if err := s.repo.UpdateDraftAppeal(ctx, entity.UpdateAppealRepoDTO{
 		UpdateAppealBase: entity.UpdateAppealBase{
-			Fname:   nil,
-			Lname:   nil,
-			Mname:   nil,
-			Subject: &dto.Data,
-			IsDraft: nil,
+			FullName: nil,
+			Subject:  &dto.Data,
+			IsDraft:  nil,
 		},
 		ChatID: dto.ChatID,
 	}); err != nil {
@@ -303,15 +299,13 @@ type sendFinalAppealDTO struct {
 func (s *Service) sendFinalAppeal(dto sendFinalAppealDTO) error {
 	var text string
 
-	fname := strings.ReplaceAll(dto.appeal.Fname, "`", "")
-	lname := strings.ReplaceAll(dto.appeal.Lname, "`", "")
-	mname := strings.ReplaceAll(dto.appeal.Mname, "`", "")
+	fullName := strings.ReplaceAll(dto.appeal.FullName, "`", "")
 	subject := strings.ReplaceAll(dto.appeal.Subject, "`", "")
 
 	text += fmt.Sprintf(
-		"*%s*: `%s %s %s`\n"+
+		"*%s*: `%s`\n"+
 			"*%s*: `%s`",
-		s.translate(newCommandFullNameTranslateKey, dto.lang), lname, fname, mname,
+		s.translate(newCommandFullNameTranslateKey, dto.lang), fullName,
 		s.translate(newCommandSubjectTranslateKey, dto.lang), subject,
 	)
 

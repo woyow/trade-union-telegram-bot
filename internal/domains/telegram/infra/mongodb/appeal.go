@@ -61,24 +61,10 @@ func (r *RepoImpl) UpdateDraftAppeal(ctx context.Context, dto entity.UpdateAppea
 
 	update := make(bson.D, 0, 1)
 
-	if dto.Fname != nil {
+	if dto.FullName != nil {
 		update = append(update, bson.E{
 			Key:   "$set",
-			Value: bson.D{{"fname", *dto.Fname}},
-		})
-	}
-
-	if dto.Lname != nil {
-		update = append(update, bson.E{
-			Key:   "$set",
-			Value: bson.D{{"lname", *dto.Lname}},
-		})
-	}
-
-	if dto.Mname != nil {
-		update = append(update, bson.E{
-			Key:   "$set",
-			Value: bson.D{{"mname", *dto.Mname}},
+			Value: bson.D{{"fullName", *dto.FullName}},
 		})
 	}
 

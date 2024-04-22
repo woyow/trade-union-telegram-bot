@@ -14,11 +14,9 @@ type CreateAppealOut struct {
 }
 
 type UpdateAppealBase struct {
-	Fname   *string
-	Lname   *string
-	Mname   *string
-	Subject *string
-	IsDraft *bool
+	FullName *string
+	Subject  *string
+	IsDraft  *bool
 }
 
 type UpdateAppealRepoDTO struct {
@@ -31,10 +29,8 @@ type GetDraftAppealRepoDTO struct {
 }
 
 type GetDraftAppealRepoOut struct {
-	Fname   string `bson:"fname"`
-	Lname   string `bson:"lname"`
-	Mname   string `bson:"mname"`
-	Subject string `bson:"subject"`
+	FullName string `bson:"fullName"`
+	Subject  string `bson:"subject"`
 }
 
 type GetAppealSubjectsRepoDTO struct {
