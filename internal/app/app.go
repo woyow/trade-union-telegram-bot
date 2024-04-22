@@ -14,7 +14,6 @@ import (
 	setupFiber "trade-union-service/internal/setup/fiber"
 	setupLogger "trade-union-service/internal/setup/logger"
 	setupMongoDB "trade-union-service/internal/setup/mongodb"
-	setupRedis "trade-union-service/internal/setup/redis"
 	setupVictoriaMetrics "trade-union-service/internal/setup/victoria-metrics"
 
 	mongoDBMigrate "trade-union-service/internal/setup/mongodb/migrate"
@@ -24,8 +23,8 @@ import (
 )
 
 type setup struct {
-	fiber    *setupFiber.Fiber
-	redis    *setupRedis.Redis
+	fiber *setupFiber.Fiber
+	// redis    *setupRedis.Redis
 	mongodb  *setupMongoDB.MongoDB
 	echotron *setupEchotron.Echotron
 	metrics  *setupVictoriaMetrics.VictoriaMetrics
@@ -61,7 +60,7 @@ func NewApp() *app {
 
 	errGroup, ctx := errgroup.WithContext(ctx)
 
-	redis := setupRedis.NewRedis(&cfg.Redis, logger)
+	// redis := setupRedis.NewRedis(&cfg.Redis, logger)
 
 	mongodb, err := setupMongoDB.NewMongoDB(ctx, &cfg.MongoDB, logger)
 	if err != nil {
@@ -90,9 +89,9 @@ func NewApp() *app {
 		ctx:      ctx,
 		cancelFn: cancel,
 		setup: setup{
-			fiber:    fiber,
-			mongodb:  mongodb,
-			redis:    redis,
+			fiber:   fiber,
+			mongodb: mongodb,
+			// redis:    redis,
 			echotron: echotron,
 			metrics:  metrics,
 		},
@@ -103,7 +102,7 @@ func NewApp() *app {
 }
 
 func (a *app) Run() error {
-	// Migrations
+	// Run migrations
 	{
 		if err := a.migrate.mongodb.Run(); err != nil {
 			return err
@@ -125,6 +124,7 @@ func (a *app) Run() error {
 		return nil
 	})
 
+	// Run fiber http server
 	a.errGroup.Go(func() error {
 		if err := a.setup.fiber.Run(a.ctx); err != nil {
 			return err
@@ -132,6 +132,7 @@ func (a *app) Run() error {
 		return nil
 	})
 
+	// Run metrics
 	a.errGroup.Go(func() error {
 		if err := a.setup.metrics.Run(); err != nil {
 			return err
@@ -139,6 +140,7 @@ func (a *app) Run() error {
 		return nil
 	})
 
+	// Wait error from group of goroutines
 	if err := a.errGroup.Wait(); err != nil {
 		a.log.Error("app: Run - g.Wait error: ", err.Error())
 		return err
