@@ -16,15 +16,15 @@ For example:
 ENV: prod
 
 # Telegram bot
-TELEGRAM_BOT_TOKEN: example-telegram-token
+TELEGRAM_BOT_TOKEN=example-telegram-token
 
 # Rest api for administrator
-ADMIN_API_TOKEN: example-token
+ADMIN_API_TOKEN=example-token
 
 # Mongodb
-MONGO_USERNAME: admin
-MONGO_PASSWORD: <your_mongo_admin_password>
-MONGO_DATABASE: tradeUnion
+MONGO_USERNAME=admin
+MONGO_PASSWORD=<your_mongo_admin_password>
+MONGO_DATABASE=tradeUnion
 ```
 
 ### 2. Create config
