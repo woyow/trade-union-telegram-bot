@@ -13,7 +13,7 @@ cp .env.example .env
 ```
 For example:
 ```dotenv
-ENV: prod
+ENV=prod
 
 # Telegram bot
 TELEGRAM_BOT_TOKEN=example-telegram-token
